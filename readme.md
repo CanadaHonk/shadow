@@ -7,4 +7,5 @@
 - :link
 - :hover
 - li markers (list-style-type)
-- text highlighting
+- text highlighting (!)
+- style caching/(in)validation (!)
