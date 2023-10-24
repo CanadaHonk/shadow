@@ -1,6 +1,6 @@
 # shadow
 
-&lt;shadow&gt; is a new novel web engine made entirely in JS, from scratch. [open it!](https://shadow.goose.icu) (more info there)
+&lt;shadow&gt; is a new novel web engine made entirely in JS (mostly) from scratch. [open it!](https://shadow.goose.icu) (more info there)
 
 ## next up
 
