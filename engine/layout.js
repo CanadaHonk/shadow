@@ -349,10 +349,10 @@ export class LayoutNode extends Node {
             inlineBlock = 0;
           }
 
-          height += x.height();
+          height += x.totalHeight();
         }
 
-        if (x.isInline()) inlineBlock = Math.max(inlineBlock, x.height());
+        if (x.isInline()) inlineBlock = Math.max(inlineBlock, x.totalHeight());
       }
 
       if (inlineBlock) {
@@ -379,6 +379,13 @@ export class LayoutNode extends Node {
     if (this.tagName === '#text') return this.renderer.measureText(this.displayContent(), this.parent.font()).height;
 
     return this.contentHeight() + this.verticalSpace();
+  }
+
+  totalWidth() {
+    return this.width() + this.marginLeft() + this.marginRight();
+  }
+  totalHeight() {
+    return this.height() + this.marginTop() + this.marginBottom();
   }
 
   x() {
