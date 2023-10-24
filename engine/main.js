@@ -82,8 +82,9 @@ load('data:text/html;base64,' + btoa(
 
 <h2>known issues</h2>
 <ul>
-<li>basically every modern site doesn't work
+<li>basically every modern site doesn't work ;)
 <li>performance is bad. this is because ${shadow} currently does ~0 optimizations.<br> <b>we recompute the entire layout every frame</b>, no (in)validation. it can be much better later :)</li>
+<li>no text wrapping yet (!)
 </ul>
 
 <h2>implemented</h2>
@@ -106,6 +107,14 @@ small {
   font-size: medium;
   margin-top: 16px;
   margin-left: 6px;
+}
+
+li {
+  margin-bottom: 2px;
+}
+
+h2 {
+  margin-top: 1.5em;
 }
 </style>
 </body>`), new URL('/', location.href));
