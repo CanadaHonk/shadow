@@ -7,3 +7,4 @@
 - :link
 - :hover
 - li markers (list-style-type)
+- text highlighting
