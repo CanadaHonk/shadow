@@ -64,9 +64,10 @@ const supported = [
 const version = `2023.10.24`;
 const days = new Date(new Date() - new Date('2023-10-23')).getDate();
 
+const shadow = `<i><b>&lt;shadow&gt;</b></i>`;
 load('data:text/html;base64,' + btoa(
 `<body>
-<h1>welcome to <i><b>&lt;shadow&gt;</b></i> <small>v${version}</small></h1>
+<h1>welcome to ${shadow} <small>v${version}</small></h1>
 <p><i><b>&lt;shadow&gt;</b></i> is a ${days} day old novel web engine made entirely in JS from scratch, only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>
 <p>here's a twist: <u>you're using it right now</u>! you can use the fps counter in the top right as an indicator. expect nothing to work :)</p>
 <p>here are some debug keybinds for you:</p>
@@ -78,6 +79,13 @@ load('data:text/html;base64,' + btoa(
 </ul>
 <h2>demo sites</h2>
 <ul>${demos.map(x => `<li><a href="${x[0]}">${x[0]}</a> (${x[1]} score)</li>`).join('\n')}</ul>
+
+<h2>known issues</h2>
+<ul>
+<li>basically every modern site doesn't work
+<li>performance is bad. this is because ${shadow} currently does ~0 optimizations.<br> <b>we recompute the entire layout every frame</b>, no (in)validation. it can be much better later :)</li>
+</ul>
+
 <h2>implemented</h2>
 <ul>${supported.map(x => `<li>${x.replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</li>`).join('\n')}</ul>
 
@@ -90,6 +98,10 @@ load('data:text/html;base64,' + btoa(
 </ul>
 
 <style>
+body {
+  font-family: sans-serif;
+}
+
 small {
   font-size: medium;
   margin-top: 16px;
