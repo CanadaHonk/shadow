@@ -56,7 +56,9 @@ const supported = [
   'css light-dark() function',
   'css selectors (partial: tag, id, class)',
   '<img> (partial)',
-  'really basic scrolling'
+  'really basic scrolling',
+  'cursor',
+  'margin collapsing',
 ];
 
 const version = `2023.10.24`;
