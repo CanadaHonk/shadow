@@ -590,3 +590,16 @@ export const constructLayout = (document, renderer) => {
 
   return doc;
 };
+
+// debug window func for getting elements of tag X
+window.$ = tag => {
+  const search = x => {
+    if (x.tagName === tag) return [ x ];
+
+    let out = [];
+    for (const y of x.children) out = out.concat(search(y));
+    return out;
+  };
+
+  return search(window._renderer.layout);
+};
