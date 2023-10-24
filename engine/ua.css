@@ -17,10 +17,6 @@ body {
   margin: 8px;
 }
 
-head {
-  display: none;
-}
-
 /* https://html.spec.whatwg.org/multipage/rendering.html#non-replaced-elements */
 address, blockquote, center, dialog, div, figure, figcaption, footer, form,
 header, hr, legend, listing, main, p, plaintext, pre, search, xmp {
