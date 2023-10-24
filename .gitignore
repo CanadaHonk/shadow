@@ -1,0 +1,6 @@
+# npm
+node_modules
+package-lock.json
+
+# root package.json is only needed for experimental frontend_node
+/package.json

@@ -1,0 +1,114 @@
+/* we have EVERYTHING inside UA */
+
+/* :root */
+html {
+  background-color: Canvas;
+  color: CanvasText;
+
+  font-family: serif;
+  font-size: medium;
+}
+
+html, body {
+  display: block;
+}
+
+body {
+  margin: 8px;
+}
+
+head {
+  display: none;
+}
+
+/* https://html.spec.whatwg.org/multipage/rendering.html#non-replaced-elements */
+address, blockquote, center, dialog, div, figure, figcaption, footer, form,
+header, hr, legend, listing, main, p, plaintext, pre, search, xmp {
+  display: block;
+}
+
+blockquote, figure, listing, p, plaintext, pre, xmp {
+  margin-top: 1em; margin-bottom: 1em;
+}
+
+blockquote, figure {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+address { font-style: italic; }
+listing, plaintext, pre, xmp {
+  font-family: monospace;
+  white-space: pre;
+}
+
+area, base, basefont, datalist, head, link, meta, noembed,
+noframes, param, rp, script, style, template, title {
+  display: none;
+}
+
+cite, dfn, em, i, var { font-style: italic; }
+/* b, strong { font-weight: bolder; } */
+b, strong { font-weight: bold; }
+code, kbd, samp, tt { font-family: monospace; }
+big { font-size: larger; }
+small { font-size: smaller; }
+
+sub { vertical-align: sub; }
+sup { vertical-align: super; }
+sub, sup { line-height: normal; font-size: smaller; }
+
+/* :link { color: #0000EE; }
+:visited { color: #551A8B; }
+:link:active, :visited:active { color: #FF0000; }
+:link, :visited { text-decoration: underline; cursor: pointer; } */
+
+a {
+  color: light-dark(#0000EE, #9E9EFF);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+ins, u { text-decoration: underline; }
+del, s, strike { text-decoration: line-through; }
+
+article, aside, h1, h2, h3, h4, h5, h6, hgroup, nav, section {
+  display: block;
+}
+
+h1 { margin-top: 0.67em; margin-bottom: 0.67em; font-size: 2.00em; font-weight: bold; }
+h2 { margin-top: 0.83em; margin-bottom: 0.83em; font-size: 1.50em; font-weight: bold; }
+h3 { margin-top: 1.00em; margin-bottom: 1.00em; font-size: 1.17em; font-weight: bold; }
+h4 { margin-top: 1.33em; margin-bottom: 1.33em; font-size: 1.00em; font-weight: bold; }
+h5 { margin-top: 1.67em; margin-bottom: 1.67em; font-size: 0.83em; font-weight: bold; }
+h6 { margin-top: 2.33em; margin-bottom: 2.33em; font-size: 0.67em; font-weight: bold; }
+
+dir, dd, dl, dt, menu, ol, ul { display: block; }
+li { display: list-item; }
+
+dir, dl, menu, ol, ul {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+/* :is(dir, dl, menu, ol, ul) :is(dir, dl, menu, ol, ul) {
+  margin-top: 0;
+  margin-bottom: 0;
+} */
+
+dd { margin-left: 40px; }
+dir, menu, ol, ul { padding-left: 40px; }
+
+ol, ul, menu { counter-reset: list-item; }
+ol { list-style-type: decimal; }
+
+dir, menu, ul {
+  list-style-type: disc;
+}
+
+:is(dir, menu, ol, ul) :is(dir, menu, ul) {
+  list-style-type: circle;
+}
+:is(dir, menu, ol, ul) :is(dir, menu, ol, ul) :is(dir, menu, ul) {
+  list-style-type: square;
+}
