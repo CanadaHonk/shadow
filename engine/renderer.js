@@ -25,16 +25,18 @@ export class Renderer {
     this.canvas.style.width = width + "px";
     this.canvas.style.height = height + "px";
 
-    this.canvas.style.imageRendering = 'pixelated';
+    this.canvas.style.imageRendering = 'crisp-edges';
 
-    this.ctx = this.canvas.getContext('2d');
+    this.ctx = this.canvas.getContext('2d', { alpha: false });
 
-    /* const ratio = window.devicePixelRatio * 2;
+    this.ctx.imageSmoothingEnabled = false;
+
+    const ratio = window.devicePixelRatio;
 
     this.canvas.width = width * ratio;
     this.canvas.height = height * ratio;
 
-    this.ctx.scale(ratio, ratio); */
+    this.ctx.scale(ratio, ratio);
 
     document.body.appendChild(this.canvas);
 
