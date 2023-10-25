@@ -489,6 +489,9 @@ export class LayoutNode extends Node {
     switch (x) {
       case 'Canvas': return colorScheme === 'dark' ? '#121212' : '#ffffff';
       case 'CanvasText': return colorScheme === 'dark' ? '#ffffff' : '#000000';
+      case 'LinkText': return colorScheme === 'dark' ? '#9E9EFF' : '#0000EE';
+      case 'ButtonFace': return colorScheme === 'dark' ? '#202020' : '#f0f0f0';
+      case 'ButtonText': return colorScheme === 'dark' ? '#ffffff' : '#000000';
     }
 
     return x;
