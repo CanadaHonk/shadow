@@ -569,6 +569,25 @@ export class LayoutNode extends Node {
     return this.lengthAbs(this.css()['font-size'], 'font-size');
   }
 
+  get textContent() {
+    let str = '';
+
+    for (const x of this.children) {
+      str += x.displayContent();
+    }
+
+    return str;
+  }
+
+  set textContent(value) {
+    this.children.forEach(x => x.remove());
+
+    const text = new LayoutNode(new Node('#text', this.document), this.renderer);
+    text.content = value.toString();
+
+    this.appendChild(text);
+  }
+
   invalidateCaches() {
     super.invalidateCaches();
 
