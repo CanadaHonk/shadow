@@ -92,7 +92,7 @@ load('data:text/html;base64,' + btoa(
 <body>
 <h1>welcome to ${shadow} <small>v${version}</small></h1>
 <p><i><b>&lt;shadow&gt;</b></i> is a ${days} day old novel web engine made entirely in JS from scratch, only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>
-<p>here's a twist: <u>you're using it right now</u>! you can use the fps counter in the top right as an indicator. expect nothing to work :)</p>
+<p>here's a twist: <u>you're using it right now</u>! you can use the fps counter in the top right as an indicator. also, expect nothing to work :)</p>
 <p>here are some debug keybinds for you:</p>
 <ul>
 <li><b>z</b>: hold for inspect mode (hover over stuff)</li>
@@ -101,7 +101,7 @@ load('data:text/html;base64,' + btoa(
 <li><b>v</b>: prompt to load url</li>
 </ul>
 <h2>demo sites</h2>
-<ul>${demos.map(x => `<li><a href="${x[0]}">${x[0]}</a> (${x[1]} score)</li>`).join('\n')}</ul>
+<ul>${demos.map(x => `<li><a href="${x[0]}">${x[0]}</a> (${x[1]})</li>`).join('\n')}</ul>
 
 <h2>known issues</h2>
 <ul>
@@ -115,7 +115,7 @@ load('data:text/html;base64,' + btoa(
 
 <h2>bonus</h2>
 <ul>
-<li>tip: refresh (ctrl+r) to reset the engine</li>
+<li>tip: use browser controls (icons or alt+arrow key) to navigate forward/backward in history</li>
 <li>tip: ctrl+click a link to open in new tab (actual browser)</li>
 <li><a href="engine/ua.css" target="_parent">UA stylesheet</a> (external)</li>
 <li><a href="https://github.com/CanadaHonk/shadow" target="_parent">source code</a> (external)</li>
