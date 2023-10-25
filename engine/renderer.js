@@ -155,24 +155,18 @@ export class Renderer {
         this.ctx.fillRect(x, y, width, height);
       }
 
-      // this.ctx.fillStyle = `rgba(0, 100, 0, ${(depth + 1) * 0.1})`;
-      /* if (_.tagName === 'p') {
-        this.ctx.fillStyle = 'red';
-        this.ctx.fillRect(x, y, width, height);
-      } */
-
       if (_.tagName === '#text') {
         this.ctx.textBaseline = 'bottom';
         this.ctx.fillStyle = _.color();
-        this.ctx.font = _.font();
-        // if (_.content.includes('23')) console.log(_.font(), '|', this.ctx.font);
-        this.ctx.fillText(_.displayContent(), x, y + height);
 
         switch (_.parent.css()['text-decoration']) {
           case 'underline':
-            this.ctx.fillRect(x, y + height - 2, width, 0.5);
+            this.ctx.fillRect(x, y + height - 3, width, 1);
             break;
         }
+
+        this.ctx.font = _.font();
+        this.ctx.fillText(_.displayContent(), x, y + height);
       }
 
       if (_.tagName === 'img' && _._image) {
