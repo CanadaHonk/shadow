@@ -88,7 +88,7 @@ const welcome = () => {
     '(partial) navigation via real browser history api'
   ];
 
-  const version = `2023.10.25`;
+  const version = `2023.10.26`;
   const days = new Date(new Date() - new Date('2023-10-23')).getDate();
 
   const shadow = `<i><b>&lt;shadow&gt;</b></i>`;
