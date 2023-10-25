@@ -22,8 +22,6 @@ export class Renderer {
     this.canvas.style.position = 'absolute';
     this.canvas.style.top = '0';
     this.canvas.style.left = '0';
-    this.canvas.style.width = cWidth + "px";
-    this.canvas.style.height = cHeight + "px";
 
     this.canvas.style.imageRendering = 'crisp-edges';
 
@@ -31,6 +29,8 @@ export class Renderer {
 
     this.ctx.imageSmoothingEnabled = false;
 
+    this.canvas.style.width = cWidth + "px";
+    this.canvas.style.height = cHeight + "px";
     this.canvas.width = cWidth * renderScale;
     this.canvas.height = cHeight * renderScale;
 
@@ -393,4 +393,19 @@ document.onwheel = e => {
 
   window._renderer.ctx.setTransform(renderScale, 0, 0, renderScale, 0, 0);
   window._renderer.ctx.translate(0, -scrollY);
+};
+
+window.onresize = () => {
+  cWidth = window.innerWidth;
+  cHeight = window.innerHeight;
+
+  window._renderer.canvas.style.width = cWidth + "px";
+  window._renderer.canvas.style.height = cHeight + "px";
+  window._renderer.canvas.width = cWidth * renderScale;
+  window._renderer.canvas.height = cHeight * renderScale;
+
+  window._renderer.ctx.setTransform(renderScale, 0, 0, renderScale, 0, 0);
+  window._renderer.ctx.translate(0, -scrollY);
+
+  window._renderer.layout.invalidateCaches();
 };
