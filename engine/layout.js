@@ -400,9 +400,12 @@ export class LayoutNode extends Node {
   }
 
   totalWidth() {
+    if (this.display() === 'none') return 0;
     return this.width() + this.marginLeft() + this.marginRight();
   }
+
   totalHeight() {
+    if (this.display() === 'none') return 0;
     return this.height() + this.marginTop() + this.marginBottom();
   }
 
