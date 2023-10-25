@@ -7,9 +7,7 @@
 
 ### next up
 
-- style caching/(in)validation (!)
 - :root
-- margin, padding shorthand
 - :link
 - :hover
 - li markers (list-style-type)
@@ -22,6 +20,8 @@
 - max width/max height
 - text wrapping (!)
 - text highlighting (!)
+- popups when using keybinds to notify info
+- inspect dom tree panel
 
 ### to investigate
 
