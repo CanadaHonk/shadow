@@ -8,22 +8,22 @@ let hoverEl, hoverLink;
 
 let scrollY = 0;
 
+const renderScale = window.devicePixelRatio * 2;
+
+let cWidth = window.innerWidth;
+let cHeight = window.innerHeight;
+
 export class Renderer {
   layout = null;
 
   constructor() {
     this.canvas = document.createElement('canvas');
 
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    this.canvas.width = width;
-    this.canvas.height = height;
-
     this.canvas.style.position = 'absolute';
     this.canvas.style.top = '0';
     this.canvas.style.left = '0';
-    this.canvas.style.width = width + "px";
-    this.canvas.style.height = height + "px";
+    this.canvas.style.width = cWidth + "px";
+    this.canvas.style.height = cHeight + "px";
 
     this.canvas.style.imageRendering = 'crisp-edges';
 
@@ -31,12 +31,10 @@ export class Renderer {
 
     this.ctx.imageSmoothingEnabled = false;
 
-    const ratio = window.devicePixelRatio;
+    this.canvas.width = cWidth * renderScale;
+    this.canvas.height = cHeight * renderScale;
 
-    this.canvas.width = width * ratio;
-    this.canvas.height = height * ratio;
-
-    this.ctx.scale(ratio, ratio);
+    this.ctx.scale(renderScale, renderScale);
 
     document.body.appendChild(this.canvas);
 
@@ -88,7 +86,7 @@ export class Renderer {
     const frameTimeStart = performance.now();
     const deltaTime = frameTimeStart - lastFrame;
 
-    this.ctx.clearRect(0, 0, this.canvas.width, scrollY + this.canvas.height);
+    this.ctx.clearRect(0, 0, cWidth, scrollY + cHeight);
 
     hoverLink = null;
 
@@ -143,7 +141,7 @@ export class Renderer {
           if (_.tagName === 'a') {
             hoverLink = _;
             doLast.push(() => {
-              this.infoBox(_.href, 0, scrollY + this.canvas.height);
+              this.infoBox(_.href, 0, scrollY + cHeight);
             });
           }
         }
@@ -201,7 +199,7 @@ export class Renderer {
       this.ctx.font = 'normal 16px sans-serif';
       this.ctx.textBaseline = 'top';
       const str = `${fps}fps`;
-      this.ctx.fillText(str, this.canvas.width - this.ctx.measureText(str).width - 12, scrollY + 12);
+      this.ctx.fillText(str, cWidth - this.ctx.measureText(str).width - 12, scrollY + 12);
     }
 
     frame++;
@@ -286,13 +284,13 @@ export class Renderer {
     this.layout = null;
 
     this.ctx.fillStyle = bg;
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.fillRect(0, 0, cWidth, cHeight);
 
     const width = 600;
     const height = 400;
 
-    const x = (this.canvas.width - width) / 2;
-    const y = (this.canvas.height - height) / 2;
+    const x = (cWidth - width) / 2;
+    const y = (cHeight - height) / 2;
 
     const borderWidth = 4;
 
@@ -378,8 +376,8 @@ document.onkeyup = e => {
 document.onwheel = e => {
   scrollY += e.deltaY;
   if (scrollY < 0) scrollY = 0;
-  scrollY = Math.min(scrollY, window._renderer.layout.totalHeight() - window._renderer.canvas.height);
+  scrollY = Math.min(scrollY, window._renderer.layout.totalHeight() - cHeight);
 
-  window._renderer.ctx.setTransform(1, 0, 0, 1, 0, 0);
+  window._renderer.ctx.setTransform(renderScale, 0, 0, renderScale, 0, 0);
   window._renderer.ctx.translate(0, -scrollY);
 };
