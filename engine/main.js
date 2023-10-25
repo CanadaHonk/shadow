@@ -78,7 +78,7 @@ const welcome = () => {
     'css light-dark() function',
     'css selectors (partial: tag, id, class)',
     '<img> (partial)',
-    'really basic scrolling',
+    'basic scrolling (no scrollbar, just via scroll wheel)',
     'cursor',
     'margin collapsing',
   ];

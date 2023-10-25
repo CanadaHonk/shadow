@@ -103,48 +103,34 @@ export class Renderer {
 
       // if (_.tagName === 'h1') console.log({ x, y, width, height });
 
-      if (depth >= 0 && !['head', 'title', 'html', 'document', 'body'].includes(_.tagName)) {
+      if (depth >= 0 && !['document'].includes(_.tagName)) {
         // this.ctx.fillStyle = `rgba(0, 100, 0, ${(depth + 1) * 0.1})`;
         // this.ctx.fillRect(x, y, width, height);
         if (lastMousePos[0] >= x && lastMousePos[0] <= (x + width) && (lastMousePos[1] + scrollY) >= y && (lastMousePos[1] + scrollY) <= (y + height)) {
-          // this.ctx.fillStyle = `rgba(0, ${_.tagName !== '#text' ? 100 : 0}, ${_.tagName === '#text' ? 100 : 0}, ${(depth - 2) * 0.2})`;
-          if (debug) {
-            /* this.ctx.fillStyle = `rgba(0, ${_.tagName !== '#text' ? 200 : 0}, ${_.tagName === '#text' ? 200 : 0}, 0.2)`;
-            this.ctx.fillRect(x, y, width, height); */
-
-            if (_.tagName !== '#text') {
-              inspects.push(() => {
-                // this.ctx.fillStyle = `rgba(0, ${_.tagName !== '#text' ? 200 : 0}, ${_.tagName === '#text' ? 200 : 0}, 0.2)`;
-
-                this.ctx.fillStyle = `rgba(249, 204, 157, 0.5)`;
-
-                this.ctx.fillRect(x, y - _.marginTop(), width, _.marginTop()); // top margin
-                this.ctx.fillRect(x, y + height, width, _.marginBottom()); // bottom margin
-                this.ctx.fillRect(x - _.marginLeft(), y, _.marginLeft(), height); // left margin
-                this.ctx.fillRect(x + width, y, _.marginRight(), height); // right margin
-
-                this.ctx.fillStyle = `rgba(195, 222, 183, 0.5)`;
-
-                this.ctx.fillRect(x, y, width, _.paddingTop()); // top padding
-                this.ctx.fillRect(x, y + height - _.paddingBottom(), width, _.paddingBottom()); // bottom padding
-                this.ctx.fillRect(x, y, _.paddingLeft(), height); // left padding
-                this.ctx.fillRect(x + width - _.paddingRight(), y, _.paddingRight(), height); // right padding
-
-                this.ctx.fillStyle = `rgba(100, 100, 250, 0.5)`;
-                this.ctx.fillRect(x + _.paddingLeft(), y + _.paddingTop(), width - _.paddingLeft() - _.paddingRight(), height - _.paddingTop() - _.paddingBottom());
-
-                this.infoBox(`${_.tagName} (x=${x},y=${y},w=${width},h=${height})`, x - _.marginLeft(), y - _.marginTop());
-              });
-
-              /* this.ctx.font = 'normal 14px sans-serif';
-              this.ctx.textBaseline = 'top';
-              this.ctx.fillStyle = _.colorAbs('CanvasText');
-              const str = `${_.tagName} (${x}, ${y})`;
-              this.ctx.fillText(str, x + width - this.ctx.measureText(str).width - 6, y + 6); */
-            }
-          }
-
           if (_.tagName !== '#text') {
+            if (debug) inspects.push(() => {
+              // this.ctx.fillStyle = `rgba(0, ${_.tagName !== '#text' ? 200 : 0}, ${_.tagName === '#text' ? 200 : 0}, 0.2)`;
+
+              this.ctx.fillStyle = `rgba(249, 204, 157, 0.5)`;
+
+              this.ctx.fillRect(x, y - _.marginTop(), width, _.marginTop()); // top margin
+              this.ctx.fillRect(x, y + height, width, _.marginBottom()); // bottom margin
+              this.ctx.fillRect(x - _.marginLeft(), y, _.marginLeft(), height); // left margin
+              this.ctx.fillRect(x + width, y, _.marginRight(), height); // right margin
+
+              this.ctx.fillStyle = `rgba(195, 222, 183, 0.5)`;
+
+              this.ctx.fillRect(x, y, width, _.paddingTop()); // top padding
+              this.ctx.fillRect(x, y + height - _.paddingBottom(), width, _.paddingBottom()); // bottom padding
+              this.ctx.fillRect(x, y, _.paddingLeft(), height); // left padding
+              this.ctx.fillRect(x + width - _.paddingRight(), y, _.paddingRight(), height); // right padding
+
+              this.ctx.fillStyle = `rgba(100, 100, 250, 0.5)`;
+              this.ctx.fillRect(x + _.paddingLeft(), y + _.paddingTop(), width - _.paddingLeft() - _.paddingRight(), height - _.paddingTop() - _.paddingBottom());
+
+              this.infoBox(`${_.tagName} (x=${x},y=${y},w=${width},h=${height},tw=${_.totalWidth()},th=${_.totalHeight()})`, x - _.marginLeft(), y - _.marginTop());
+            });
+
             hoverEl = _;
 
             const newCursor = _.css().cursor;
@@ -355,7 +341,7 @@ const userLoad = x => {
     if (e.stack.includes('HTMLParser')) title = 'HTML parser error';
     if (e.stack.includes('CSSParser')) title = 'CSS parser error';
 
-    console.log({ _: e.stack });
+    console.log(e);
     window._renderer.error(title, e.stack);
   });
 };
@@ -396,6 +382,7 @@ document.onkeyup = e => {
 document.onwheel = e => {
   scrollY += e.deltaY;
   if (scrollY < 0) scrollY = 0;
+  scrollY = Math.min(scrollY, window._renderer.layout.totalHeight() - window._renderer.canvas.height);
 
   window._renderer.ctx.setTransform(1, 0, 0, 1, 0, 0);
   window._renderer.ctx.translate(0, -scrollY);
