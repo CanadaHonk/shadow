@@ -17,11 +17,11 @@ export const SelectorType = {
   Class: 2,
 };
 
-class CSSRule {
+export class CSSRule {
   selectors = [];
   properties = {};
 
-  parseSelectors(input) {
+  static parseSelector(input) {
     input = input.trim();
     const out = [];
 
@@ -57,7 +57,7 @@ class CSSRule {
 
   constructor(selectors) {
     this.selectorText = selectors.trim();
-    this.selectors = this.parseSelectors(selectors);
+    this.selectors = CSSRule.parseSelector(selectors);
   }
 
   addProperty(property, value) {

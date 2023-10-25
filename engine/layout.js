@@ -1,5 +1,5 @@
 import { Node } from './dom.js';
-import { CSSParser, SelectorType } from './cssparser.js';
+import { CSSParser, CSSRule, SelectorType } from './cssparser.js';
 
 const uaRaw = globalThis.node ? (await import('fs')).readFileSync(globalThis.uaPath, 'utf8') : await (await fetch('engine/ua.css')).text();
 const uaRules = new CSSParser().parse(uaRaw);
@@ -67,6 +67,40 @@ export class LayoutNode extends Node {
     if (this.tagName === 'img') this.image();
   }
 
+  matchesCSS(selector) {
+    for (const x of selector) { // a, b, c (a OR b OR c)
+      let match = true;
+      for (const y of x) { // a#b.c (a AND b AND c)
+        if (
+          !(y.type === SelectorType.Tag && this.tagName === y.text) && // tag
+          !(y.type === SelectorType.Id && this.id === y.text) && // id
+          !(y.type === SelectorType.Class && this.hasClass(y.text)) // class
+        ) {
+          match = false;
+          break;
+        }
+      }
+
+      if (match) return true;
+    }
+
+    return false;
+  }
+
+  querySelector(text) {
+    const selector = CSSRule.parseSelector(text);
+
+    const find = x => {
+      if (x.matchesCSS(selector)) return x;
+
+      for (const y of x.children) {
+        const o = find(y);
+        if (o) return o;
+      }
+    };
+    return find(this);
+  }
+
   // what are our css properties?
   _cssCache = null;
   css() {
@@ -91,27 +125,11 @@ export class LayoutNode extends Node {
     let props = { ...defaultProperties, ...inherited };
 
     for (const x of rules) {
-      for (const y of x.selectors) { // a, b, c (a OR b OR c)
-        let match = true;
-        for (const z of y) { // a#b.c (a AND b AND c)
-          if (
-            !(z.type === SelectorType.Tag && this.tagName === z.text) && // tag
-            !(z.type === SelectorType.Id && this.id === z.text) && // id
-            !(z.type === SelectorType.Class && this.hasClass(z.text)) // class
-          ) {
-            match = false;
-            break;
-          }
-        }
-
-        if (match) {
-          props = {
-            ...props,
-            ...x.properties
-          };
-
-          break;
-        }
+      if (this.matchesCSS(x.selectors)) {
+        props = {
+          ...props,
+          ...x.properties
+        };
       }
     }
 
@@ -591,15 +609,4 @@ export const constructLayout = (document, renderer) => {
   return doc;
 };
 
-// debug window func for getting elements of tag X
-window.$ = tag => {
-  const search = x => {
-    if (x.tagName === tag) return [ x ];
-
-    let out = [];
-    for (const y of x.children) out = out.concat(search(y));
-    return out;
-  };
-
-  return search(window._renderer.layout);
-};
+window.$ = x => window._renderer.layout.querySelector(x);
