@@ -26,6 +26,17 @@ export class Node {
     }
   }
 
+  allChildren() {
+    let o = [];
+
+    for (const x of this.children) {
+      o.push(x);
+      o = o.concat(x.allChildren());
+    }
+
+    return o;
+  }
+
   get id() {
     return this.attrs.id;
   }

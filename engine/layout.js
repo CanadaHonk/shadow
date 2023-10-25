@@ -50,6 +50,8 @@ const defaultFontSize = 16; // px
 const byPtr = {};
 export class LayoutNode extends Node {
   renderer = null;
+
+  cache = {};
   constructor(node, renderer) {
     super();
     Object.assign(this, { ...node, renderer });
@@ -59,15 +61,14 @@ export class LayoutNode extends Node {
 
     const cache = k => {
       const f = this[k].bind(this);
-      let cached;
+
       this[k] = function() {
-        if (cached) return cached;
-        return cached = f.apply(this, arguments);
+        if (this.cache[k]) return this.cache[k];
+        return this.cache[k] = f.apply(this, arguments);
       }.bind(this);
     };
 
-    // cache('x'); cache('y'); cache('width'); cache('height');
-
+    cache('x'); cache('y'); cache('width'); cache('height');
     if (this.tagName === 'img') this.image();
   }
 
@@ -559,6 +560,8 @@ export class LayoutNode extends Node {
     this._image.style.display = 'none';
     document.body.appendChild(this._image);
 
+    this._image.onload = () => this.invalidateCaches();
+
     return this._image;
   }
 
@@ -626,10 +629,20 @@ export class LayoutNode extends Node {
     this.appendChild(text);
   }
 
-  invalidateCaches() {
+  invalidateCaches(sub = false) {
     super.invalidateCaches();
 
+    // just invalidate the entire document
+    // todo: not do this
+    if (!sub) {
+      this.document.invalidateCaches(true);
+      for (const x of this.document.allChildren()) x.invalidateCaches(true);
+    }
+
+    // if (this.parent) this.parent.invalidateCaches();
+
     this._cssCache = null;
+    this.cache = {};
   }
 }
 
