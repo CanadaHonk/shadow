@@ -38,7 +38,14 @@ export class Renderer {
 
     document.body.appendChild(this.canvas);
 
-    this.update = this.update.bind(this);
+    const _update = this.update.bind(this);
+    this.update = (() => {
+      try {
+        _update();
+      } catch (e) {
+        this.error(e);
+      }
+    }).bind(this);
     this.update();
 
     if (globalThis.node) {
@@ -86,7 +93,7 @@ export class Renderer {
     const frameTimeStart = performance.now();
     const deltaTime = frameTimeStart - lastFrame;
 
-    this.ctx.clearRect(0, 0, cWidth, scrollY + cHeight);
+    this.ctx.clearRect(0, scrollY, cWidth, scrollY + cHeight);
 
     hoverLink = null;
 
@@ -277,14 +284,19 @@ export class Renderer {
     }
   }
 
-  error(title, detail) {
-    const bg = '#04080b'; // this.layout.colorAbs('Canvas');
-    const fg = this.layout.colorAbs('CanvasText');
+  error(e) {
+    let title = 'Fatal error';
+    if (e.stack.includes('HTMLParser')) title = 'HTML parser error';
+    if (e.stack.includes('CSSParser')) title = 'CSS parser error';
+    if (e.stack.includes('Render')) title = 'Render error';
+    if (e.stack.includes('Layout')) title = 'Layout error';
+
+    let detail = e.stack;
 
     this.layout = null;
 
-    this.ctx.fillStyle = bg;
-    this.ctx.fillRect(0, 0, cWidth, cHeight);
+    this.ctx.fillStyle = '#04080b';
+    this.ctx.fillRect(0, scrollY, cWidth, cHeight + scrollY);
 
     const width = 600;
     const height = 400;
@@ -329,24 +341,13 @@ document.onmousemove = e => {
   return false;
 };
 
-const userLoad = x => {
-  window.load(x).catch(e => {
-    let title;
-    if (e.stack.includes('HTMLParser')) title = 'HTML parser error';
-    if (e.stack.includes('CSSParser')) title = 'CSS parser error';
-
-    console.log(e);
-    window._renderer.error(title, e.stack);
-  });
-};
-
 document.onmouseup = e => {
   lastMousePos = [ e.clientX, e.clientY ];
   e.preventDefault();
 
   if (hoverLink) {
     if (hoverEl.attrs.target === '_parent' || e.ctrlKey) window.open(hoverEl.href.toString(), '_blank');
-      else userLoad(hoverEl.href.toString());
+      else window.load(hoverEl.href.toString());
   }
 
   return false;
@@ -370,7 +371,7 @@ document.onkeyup = e => {
       document.querySelector('canvas').style.display = 'none';
     }, 100);
   }
-  if (k === 'v') userLoad(prompt('url to load:'));
+  if (k === 'v') window.load(prompt('url to load:'));
 };
 
 document.onwheel = e => {

@@ -13,7 +13,7 @@ window.onpopstate = ({ state }) => {
 };
 
 let renderer, initialLoad = true;
-const load = async (url, baseUrl = null, push = true) => {
+const _load = async (url, baseUrl = null, push = true) => {
   if (!renderer) renderer = new Renderer();
 
   console.log(url);
@@ -52,6 +52,7 @@ const load = async (url, baseUrl = null, push = true) => {
   renderer.layout = layout;
 };
 
+const load = (...args) => _load(...args).catch(e => renderer.error(e));
 window.load = load;
 
 const welcome = () => {
