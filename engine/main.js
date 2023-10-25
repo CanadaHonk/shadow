@@ -102,6 +102,7 @@ load('data:text/html;base64,' + btoa(
 <li><b>x</b>: switch color scheme (light/dark)</li>
 <li><b>c</b>: dump parsed html</li>
 <li><b>v</b>: prompt to load url</li>
+<li><b>h</b>: go back to welcome page (here)</li>
 </ul>
 <h2>demo sites</h2>
 <ul>${demos.map(x => `<li><a href="${x[0]}">${x[0]}</a> (${x[1]})</li>`).join('\n')}</ul>
@@ -145,6 +146,7 @@ h2 {
 </style>
 </body>`), new URL('/', location.href));
 };
+window.welcome = welcome;
 
 if (location.search) load(location.search.slice(1));
   else welcome();

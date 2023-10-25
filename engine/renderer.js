@@ -374,6 +374,7 @@ document.onkeyup = e => {
     }, 100);
   }
   if (k === 'v') window.load(prompt('url to load:'));
+  if (k === 'h') window.welcome();
 };
 
 document.onwheel = e => {
