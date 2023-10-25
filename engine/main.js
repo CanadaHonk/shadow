@@ -4,10 +4,21 @@ import { constructLayout } from './layout.js';
 import { Renderer } from './renderer.js';
 
 
-let renderer;
-const load = async (url, baseUrl = null) => {
+window.onpopstate = ({ state }) => {
+  const url = state?.url ?? location.search.slice(1);
+  const baseUrl = state?.baseUrl ? new URL(state.baseUrl) : null;
+
+  if (url) load(url, baseUrl, false);
+    else welcome();
+};
+
+let renderer, initialLoad = true;
+const load = async (url, baseUrl = null, push = true) => {
   if (!renderer) renderer = new Renderer();
+
   console.log(url);
+
+  history[push && !initialLoad ? 'pushState' : 'replaceState']({ url, baseUrl: baseUrl?.toString?.() }, '', '?' + (baseUrl ? '' : url));
 
   const page = new Page(url);
   if (baseUrl) page.baseURL = baseUrl;
@@ -25,6 +36,7 @@ const load = async (url, baseUrl = null) => {
   doc.page = page;
 
   const layout = constructLayout(doc, renderer);
+  console.log(layout);
 
   const title = layout.querySelector('title');
 
@@ -36,6 +48,7 @@ const load = async (url, baseUrl = null) => {
 
   favicon_setter.href = page.resolve('/favicon.ico');
 
+  initialLoad = false;
   renderer.layout = layout;
 };
 
