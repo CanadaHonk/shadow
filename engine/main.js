@@ -2,7 +2,9 @@ import { Page } from './network.js';
 import { HTMLParser } from './htmlparser.js';
 import { constructLayout } from './layout.js';
 import { Renderer } from './renderer.js';
+import * as JS from './js/index.js';
 
+window._js = JS;
 
 window.onpopstate = ({ state }) => {
   const url = state?.url ?? location.search.slice(1);
@@ -103,19 +105,28 @@ load('data:text/html;base64,' + btoa(
 <li><b>c</b>: dump parsed html</li>
 <li><b>v</b>: prompt to load url</li>
 <li><b>h</b>: go back to welcome page (here)</li>
+<li><b>j</b>: cycle JS engine (none -> SpiderMonkey -> Kiesel)</li>
 </ul>
 <h2>demo sites</h2>
 <ul>${demos.map(x => `<li><a href="${x[0]}">${x[0]}</a> (${x[1]})</li>`).join('\n')}</ul>
 
 <h2>known issues</h2>
 <ul>
-<li>basically every modern site doesn't work ;)
+<li>basically every site doesn't work ;)
 <li>performance is bad. this is because ${shadow} currently does ~0 optimizations.<br> <b>we recompute the entire layout every frame</b>, no (in)validation. it can be much better later :)</li>
 <li>no text wrapping yet (!)
 </ul>
 
-<h2>implemented</h2>
-<ul>${supported.map(x => `<li>${x.replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</li>`).join('\n')}</ul>
+<h2>javascript <span class="new">new!</span></h2>
+<p>${shadow} has extremely experimental javascript support. this is not intended to be usable, rather a proof of concept. off by default.</p>
+<p>bonus: <b>you can choose which JS engine to use!</b></p>
+
+<ul>
+<li><a href="https://spidermonkey.dev">SpiderMonkey</a> (Firefox's JS engine)</li>
+<li><a href="https://kiesel.dev">Kiesel</a> (a WIP engine from scratch in Zig)</li>
+</ul>
+
+<button onclick="let el = document.querySelector('#counter'); el.textContent = parseInt(el.textContent) + 1">click me!</button>&nbsp;<span id="counter">0</span><noscript dynamic=true>(you have JS disabled, press J)</noscript>
 
 <h2>bonus</h2>
 <ul>
@@ -124,6 +135,9 @@ load('data:text/html;base64,' + btoa(
 <li><a href="engine/ua.css" target="_parent">UA stylesheet</a> (external)</li>
 <li><a href="https://github.com/CanadaHonk/shadow" target="_parent">source code</a> (external)</li>
 </ul>
+
+<h2>implemented</h2>
+<ul>${supported.map(x => `<li>${x.replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</li>`).join('\n')}</ul>
 
 <style>
 body {
@@ -142,6 +156,17 @@ li {
 
 h2 {
   margin-top: 1.5em;
+}
+
+.new {
+  color: red;
+  font-size: 0.8em;
+}
+
+noscript {
+  margin-left: 20px;
+  color: gray;
+  font-size: 0.8em;
 }
 </style>
 </body>`), new URL('/', location.href));

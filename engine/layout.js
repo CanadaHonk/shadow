@@ -47,11 +47,15 @@ window.colorScheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark'
 // uh yeah this is just a constant :)
 const defaultFontSize = 16; // px
 
+const byPtr = {};
 export class LayoutNode extends Node {
   renderer = null;
   constructor(node, renderer) {
     super();
     Object.assign(this, { ...node, renderer });
+
+    this.ptr = parseInt(Math.random().toString().slice(2, 12));
+    byPtr[this.ptr] = this;
 
     const cache = k => {
       const f = this[k].bind(this);
@@ -65,6 +69,10 @@ export class LayoutNode extends Node {
     // cache('x'); cache('y'); cache('width'); cache('height');
 
     if (this.tagName === 'img') this.image();
+  }
+
+  getFromPtr(ptr) {
+    return byPtr[ptr];
   }
 
   matchesCSS(selector) {
@@ -193,6 +201,8 @@ export class LayoutNode extends Node {
   }
 
   display() {
+    if (this.tagName === 'noscript' && this.attrs.dynamic) return window._js.backendName ? 'none' : 'inline';
+
     // if (this.tagName === '#text') return 'inline';
     return this.css().display;
   }

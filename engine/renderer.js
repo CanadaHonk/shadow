@@ -352,6 +352,10 @@ document.onmouseup = e => {
       else window.load(hoverEl.href.toString());
   }
 
+  if (hoverEl) {
+    if (hoverEl.attrs.onclick) window._js.run(window._renderer.layout, hoverEl.attrs.onclick);
+  }
+
   return false;
 };
 
@@ -375,6 +379,11 @@ document.onkeyup = e => {
   }
   if (k === 'v') window.load(prompt('url to load:'));
   if (k === 'h') window.welcome();
+  if (k === 'j') {
+    const current = window._js.backendName;
+    const backends = [ null, 'spidermonkey', 'kiesel' ];
+    window._js.setBackend(backends[(backends.indexOf(current) + 1) % 3]);
+  }
 };
 
 document.onwheel = e => {
