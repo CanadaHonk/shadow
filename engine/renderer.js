@@ -389,7 +389,7 @@ document.onkeyup = e => {
 document.onwheel = e => {
   scrollY += e.deltaY;
   if (scrollY < 0) scrollY = 0;
-  scrollY = Math.min(scrollY, window._renderer.layout.totalHeight() - cHeight);
+  scrollY = Math.min(scrollY, Math.max(0, window._renderer.layout.totalHeight() - cHeight));
 
   window._renderer.ctx.setTransform(renderScale, 0, 0, renderScale, 0, 0);
   window._renderer.ctx.translate(0, -scrollY);
