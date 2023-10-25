@@ -313,6 +313,21 @@ export class LayoutNode extends Node {
     return (margin ? (this.marginTop() + this.marginBottom()) : 0) + this.paddingTop() + this.paddingBottom() + this.borderTopWidth() + this.borderBottomWidth();
   }
 
+  collapseVerticalMargin(y) {
+    if (this.marginTop() >= this.siblingBefore?.marginBottom?.()) y -= this.siblingBefore.marginBottom();
+
+    // ??
+    if (this.siblingBefore?.marginBottom?.() > this.marginTop()) y -= this.marginTop();
+
+    // ??
+    if (!this.siblingBefore && this.parent && this.marginTop() >= this.parent.marginTop()) {
+      y -= this.marginTop();
+      y += this.parent.marginTop();
+    }
+
+    return y;
+  }
+
   contentWidth() {
     if (this.tagName === 'document') return this.renderer.canvas.width;
 
@@ -406,7 +421,12 @@ export class LayoutNode extends Node {
 
   totalHeight() {
     if (this.display() === 'none') return 0;
-    return this.height() + this.marginTop() + this.marginBottom();
+
+    let y = this.height() + this.marginTop() + this.marginBottom();
+
+    y = this.collapseVerticalMargin(y);
+
+    return y;
   }
 
   x() {
@@ -462,20 +482,7 @@ export class LayoutNode extends Node {
       y += this.parent.paddingTop();
     }
 
-    // basic collapsing margin
-    // if (this.id === 't') console.log(this.marginTop(), this.siblingBefore?.marginBottom?.());
-    if (this.marginTop() >= this.siblingBefore?.marginBottom?.()) y -= this.siblingBefore.marginBottom();
-
-    // ??
-    if (this.siblingBefore?.marginBottom?.() > this.marginTop()) y -= this.marginTop();
-
-    // ??
-    // if (this.tagName === 'h1') console.log(y, this.marginTop(), this.parent.marginTop());
-    if (!this.siblingBefore && this.marginTop() >= this.parent.marginTop()) {
-      // y = this.parent.marginTop() - this.marginTop();
-      y -= this.marginTop();
-      y += this.parent.marginTop();
-    }
+    y = this.collapseVerticalMargin(y);
 
     return y;
   }
