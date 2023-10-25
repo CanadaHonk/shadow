@@ -33,38 +33,39 @@ const load = async (url, baseUrl = null) => {
 
 window.load = load;
 
-const demos = [
-  [ 'https://serenityos.org', '8/10' ],
-  [ 'https://info.cern.ch/hypertext/WWW/TheProject.html', '9/10' ]
-];
+const welcome = () => {
+  const demos = [
+    [ 'https://serenityos.org', 'looks pretty good' ],
+    [ 'https://info.cern.ch/hypertext/WWW/TheProject.html', 'basically spot on' ]
+  ];
 
-const supported = [
-  'html parsing (partial)',
-  'css parsing (partial)',
-  'basic inline and block model',
-  'renderer',
-  'user agent stylesheet',
-  '<style>',
-  'self closing html',
-  '<font> (partial)',
-  'light/dark color schemes',
-  'links',
-  'link hints (bottom left text)',
-  'font-size, font-family, font-style',
-  'color',
-  'background-color',
-  'css light-dark() function',
-  'css selectors (partial: tag, id, class)',
-  '<img> (partial)',
-  'really basic scrolling',
-  'cursor',
-  'margin collapsing',
-];
+  const supported = [
+    'html parsing (partial)',
+    'css parsing (partial)',
+    'basic inline and block model',
+    'renderer',
+    'user agent stylesheet',
+    '<style>',
+    'self closing html',
+    '<font> (partial)',
+    'light/dark color schemes',
+    'links',
+    'link hints (bottom left text)',
+    'font-size, font-family, font-style',
+    'color',
+    'background-color',
+    'css light-dark() function',
+    'css selectors (partial: tag, id, class)',
+    '<img> (partial)',
+    'really basic scrolling',
+    'cursor',
+    'margin collapsing',
+  ];
 
-const version = `2023.10.24`;
-const days = new Date(new Date() - new Date('2023-10-23')).getDate();
+  const version = `2023.10.24`;
+  const days = new Date(new Date() - new Date('2023-10-23')).getDate();
 
-const shadow = `<i><b>&lt;shadow&gt;</b></i>`;
+  const shadow = `<i><b>&lt;shadow&gt;</b></i>`;
 load('data:text/html;base64,' + btoa(
 `<body>
 <h1>welcome to ${shadow} <small>v${version}</small></h1>
@@ -118,6 +119,10 @@ h2 {
 }
 </style>
 </body>`), new URL('/', location.href));
+};
+
+if (location.search) load(location.search.slice(1));
+  else welcome();
 
 // load('https://serenityos.org');
 // load('https://info.cern.ch/hypertext/WWW/TheProject.html');
