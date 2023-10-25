@@ -81,6 +81,8 @@ const welcome = () => {
     'basic scrolling (no scrollbar, just via scroll wheel)',
     'cursor',
     'margin collapsing',
+    'copying page title and favicon to real browser tab',
+    '(partial) navigation via real browser history api'
   ];
 
   const version = `2023.10.25`;
