@@ -8,7 +8,7 @@ let hoverEl, hoverLink;
 
 let scrollY = 0;
 
-const renderScale = window.devicePixelRatio * 2;
+const renderScale = window.devicePixelRatio * 1;
 
 let cWidth = window.innerWidth;
 let cHeight = window.innerHeight;
