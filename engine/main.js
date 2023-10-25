@@ -83,7 +83,7 @@ const welcome = () => {
     'margin collapsing',
   ];
 
-  const version = `2023.10.24`;
+  const version = `2023.10.25`;
   const days = new Date(new Date() - new Date('2023-10-23')).getDate();
 
   const shadow = `<i><b>&lt;shadow&gt;</b></i>`;
