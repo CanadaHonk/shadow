@@ -31,7 +31,7 @@ export class Node {
   }
 
   get className() {
-    return this.attrs.class;
+    return this.attrs.class ?? '';
   }
 
   _classesCache;
