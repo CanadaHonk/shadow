@@ -142,13 +142,6 @@ export class LayoutNode extends Node {
       if (this.attrs.color) props.color = this.attrs.color;
     }
 
-    // probably should do jit?
-    /* for (const x in props) {
-      props[x] = this.resolveValue(props[x]);
-    } */
-
-    // if (this.tagName === 'p') console.log(props);
-
     return this._cssCache = props;
 
     // possible optimizations for later:
