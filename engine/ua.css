@@ -59,6 +59,14 @@ sub, sup { line-height: normal; font-size: smaller; }
 :link:active, :visited:active { color: #FF0000; }
 :link, :visited { text-decoration: underline; cursor: pointer; } */
 
+button {
+  cursor: pointer;
+  padding: 1px 6px;
+  background-color: ButtonFace;
+  color: ButtonText;
+  font-size: smaller;
+}
+
 a {
   color: LinkText;
   text-decoration: underline;
