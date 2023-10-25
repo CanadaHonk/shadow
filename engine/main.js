@@ -173,7 +173,7 @@ noscript {
 };
 window.welcome = welcome;
 
-if (location.search) load(location.search.slice(1));
+if (location.search) load(decodeURIComponent(location.search.slice(1)));
   else welcome();
 
 // load('https://serenityos.org');
