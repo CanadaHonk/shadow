@@ -101,6 +101,19 @@ export class LayoutNode extends Node {
     return find(this);
   }
 
+  // parse a [ b [ c [ d ] ] ] shorthand (eg margin, padding) into [top, bottom, left, right]
+  parse4Shorthand(x) {
+    x = this.resolveValue(x);
+    const spl = x.split(' ').filter(x => x);
+
+    switch (spl.length) {
+      case 1: return [ spl[0], spl[0], spl[0], spl[0] ];
+      case 2: return [ spl[0], spl[0], spl[1], spl[1] ];
+      case 3: return [ spl[0], spl[2], spl[1], spl[1] ];
+      case 4: return spl;
+    }
+  }
+
   // what are our css properties?
   _cssCache = null;
   css() {
@@ -133,13 +146,28 @@ export class LayoutNode extends Node {
       }
     }
 
-    // N shorthand hack
-    if (props.margin) {
-      props['margin-top'] = props['margin-bottom'] = props['margin-left'] = props['margin-right'] = props.margin;
-    }
-
     if (this.tagName === 'font') {
       if (this.attrs.color) props.color = this.attrs.color;
+    }
+
+    if (props.margin) {
+      const [ marginTop, marginBottom, marginLeft, marginRight ] = this.parse4Shorthand(props.margin);
+
+      // todo: this does not follow specificity lol
+      props['margin-top'] = marginTop;
+      props['margin-bottom'] = marginBottom;
+      props['margin-left'] = marginLeft;
+      props['margin-right'] = marginRight;
+    }
+
+    if (props.padding) {
+      const [ paddingTop, paddingBottom, paddingLeft, paddingRight ] = this.parse4Shorthand(props.padding);
+
+      // todo: this does not follow specificity lol
+      props['padding-top'] = paddingTop;
+      props['padding-bottom'] = paddingBottom;
+      props['padding-left'] = paddingLeft;
+      props['padding-right'] = paddingRight;
     }
 
     return this._cssCache = props;
