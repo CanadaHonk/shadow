@@ -60,7 +60,7 @@ sub, sup { line-height: normal; font-size: smaller; }
 :link, :visited { text-decoration: underline; cursor: pointer; } */
 
 a {
-  color: light-dark(#0000EE, #9E9EFF);
+  color: LinkText;
   text-decoration: underline;
   cursor: pointer;
 }
