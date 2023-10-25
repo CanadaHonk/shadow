@@ -285,6 +285,8 @@ export class Renderer {
   }
 
   error(e) {
+    console.error(e);
+
     let title = 'Fatal error';
     if (e.stack.includes('HTMLParser')) title = 'HTML parser error';
     if (e.stack.includes('CSSParser')) title = 'CSS parser error';
