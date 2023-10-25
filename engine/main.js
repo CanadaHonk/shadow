@@ -26,7 +26,15 @@ const load = async (url, baseUrl = null) => {
 
   const layout = constructLayout(doc, renderer);
 
-  console.log(layout);
+  const title = layout.querySelector('title');
+
+  if (title) {
+    title_setter.innerHTML = (title.content || title.children[0]?.content).trim();
+  } else {
+    title_setter.textContent = url.replace('https://', '');
+  }
+
+  favicon_setter.href = page.resolve('/favicon.ico');
 
   renderer.layout = layout;
 };
@@ -67,7 +75,8 @@ const welcome = () => {
 
   const shadow = `<i><b>&lt;shadow&gt;</b></i>`;
 load('data:text/html;base64,' + btoa(
-`<body>
+`<title>&lt;shadow&gt;</title>
+<body>
 <h1>welcome to ${shadow} <small>v${version}</small></h1>
 <p><i><b>&lt;shadow&gt;</b></i> is a ${days} day old novel web engine made entirely in JS from scratch, only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>
 <p>here's a twist: <u>you're using it right now</u>! you can use the fps counter in the top right as an indicator. expect nothing to work :)</p>
