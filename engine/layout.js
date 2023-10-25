@@ -230,9 +230,9 @@ export class LayoutNode extends Node {
         if (trimStart) content = content.trimStart();
         if (trimEnd) content = content.trimEnd();
 
-        content = content.replaceAll('&gt;', '>').replaceAll('&lt;', '<')
+        content = content.replaceAll('&gt;', '>').replaceAll('&lt;', '<');
 
-        return content.replace(/[\t\n\r]/g, ' ').replace(/ {2,}/g, ' ');
+        return content.replace(/[\t\n\r]/g, ' ').replace(/ {2,}/g, ' ').replaceAll('&nbsp;', ' ');
 
       case 'pre':
         return this.content;
