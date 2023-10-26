@@ -115,7 +115,6 @@ load('data:text/html;base64,' + btoa(
 <h2>known issues</h2>
 <ul>
 <li>basically every site doesn't work ;)
-<li>performance is bad. this is because ${shadow} currently does ~0 optimizations.<br> <b>we recompute the entire layout every frame</b>, no (in)validation. it can be much better later :)</li>
 <li>no text wrapping yet (!)
 </ul>
 
