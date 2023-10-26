@@ -60,7 +60,9 @@ window.load = load;
 const welcome = () => {
   const demos = [
     [ 'https://serenityos.org', 'looks pretty good' ],
-    [ 'https://info.cern.ch/hypertext/WWW/TheProject.html', 'basically spot on' ]
+    [ 'https://info.cern.ch/hypertext/WWW/TheProject.html', 'basically spot on' ],
+    [ 'https://www.stroustrup.com', 'usable?' ],
+    [ 'https://cs.sjoy.lol', 'usable?' ],
   ];
 
   const supported = [
