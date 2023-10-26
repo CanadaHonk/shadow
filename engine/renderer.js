@@ -120,15 +120,15 @@ export class Renderer {
 
               this.ctx.fillStyle = `rgba(249, 204, 157, 0.5)`;
 
-              this.ctx.fillRect(x, y - _.marginTop(), width, _.marginTop()); // top margin
-              this.ctx.fillRect(x, y + height, width, _.marginBottom()); // bottom margin
+              this.ctx.fillRect(x - _.marginLeft(), y - _.marginTop(), width + _.marginLeft() + _.marginRight(), _.marginTop()); // top margin
+              this.ctx.fillRect(x - _.marginLeft(), y + height, width + _.marginLeft() + _.marginRight(), _.marginBottom()); // bottom margin
               this.ctx.fillRect(x - _.marginLeft(), y, _.marginLeft(), height); // left margin
               this.ctx.fillRect(x + width, y, _.marginRight(), height); // right margin
 
               this.ctx.fillStyle = `rgba(195, 222, 183, 0.5)`;
 
-              this.ctx.fillRect(x, y, width, _.paddingTop()); // top padding
-              this.ctx.fillRect(x, y + height - _.paddingBottom(), width, _.paddingBottom()); // bottom padding
+              this.ctx.fillRect(x + _.paddingLeft(), y, width - _.paddingLeft() - _.paddingRight(), _.paddingTop()); // top padding
+              this.ctx.fillRect(x + _.paddingLeft(), y + height - _.paddingBottom(), width - _.paddingLeft() - _.paddingRight(), _.paddingBottom()); // bottom padding
               this.ctx.fillRect(x, y, _.paddingLeft(), height); // left padding
               this.ctx.fillRect(x + width - _.paddingRight(), y, _.paddingRight(), height); // right padding
 
