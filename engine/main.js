@@ -116,6 +116,8 @@ load('data:text/html;base64,' + btoa(
 <ul>
 <li>basically every site doesn't work ;)
 <li>no text wrapping yet (!)
+<li>no text highlighting yet
+<li>html parser is not happy
 </ul>
 
 <h2>javascript <span class="new">new!</span></h2>
