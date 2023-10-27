@@ -98,7 +98,7 @@ load('data:text/html;base64,' + btoa(
 `<title>&lt;shadow&gt;</title>
 <body>
 <h1>welcome to ${shadow} <small>v${version}</small></h1>
-<p><i><b>&lt;shadow&gt;</b></i> is a ${days} day old novel web engine made entirely in JS from scratch, only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>
+<p><i><b>&lt;shadow&gt;</b></i> is a ${days} day old novel web engine made (almost) entirely in JS from scratch, only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>
 <p>here's a twist: <u>you're using it right now</u>! you can use the fps counter in the top right as an indicator. also, expect nothing to work :)</p>
 <p>here are some debug keybinds for you:</p>
 <ul>
