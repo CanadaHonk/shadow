@@ -377,7 +377,7 @@ document.onkeyup = e => {
       document.querySelector('canvas').style.display = 'none';
     }, 100);
   }
-  if (k === 'v') window.load(prompt('url to load:'));
+  if (k === 'v') window.omniload(prompt('url to load:'));
   if (k === 'h') window.welcome();
   if (k === 'j') {
     const current = window._js.backendName;

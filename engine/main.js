@@ -57,6 +57,21 @@ const _load = async (url, baseUrl = null, push = true) => {
 const load = (...args) => _load(...args).catch(e => renderer.error(e));
 window.load = load;
 
+const omniload = (query) => {
+  let url;
+  try {
+    url = new URL(query);
+  } catch (error) {
+    try {
+      url = new URL("https://" + query);
+    } catch (e) {
+      return renderer.error(e)
+    }
+  }
+  return load(url.toString())
+}
+window.omniload = omniload;
+
 const welcome = () => {
   const demos = [
     [ 'https://serenityos.org', 'looks pretty good' ],
