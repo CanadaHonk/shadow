@@ -43,7 +43,7 @@ export class Renderer {
       try {
         _update();
       } catch (e) {
-        this.error(e);
+        error(e);
       }
     }).bind(this);
     this.update();
@@ -282,50 +282,6 @@ export class Renderer {
       const measure = this.ctx.measureText(l);
       y += measure.height ?? (Math.abs(measure.fontBoundingBoxAscent) + Math.abs(measure.fontBoundingBoxDescent));
     }
-  }
-
-  error(e) {
-    console.error(e);
-
-    let title = 'Fatal error';
-    if (e.stack.includes('HTMLParser')) title = 'HTML parser error';
-    if (e.stack.includes('CSSParser')) title = 'CSS parser error';
-    if (e.stack.includes('Render')) title = 'Render error';
-    if (e.stack.includes('Layout')) title = 'Layout error';
-
-    let detail = e.stack;
-
-    this.layout = null;
-
-    this.ctx.fillStyle = '#04080b';
-    this.ctx.fillRect(0, scrollY, cWidth, cHeight + scrollY);
-
-    const width = 600;
-    const height = 400;
-
-    const x = (cWidth - width) / 2;
-    const y = (cHeight - height) / 2;
-
-    const borderWidth = 4;
-
-    this.ctx.strokeStyle = 'rgb(250, 40, 40)';
-    this.ctx.lineWidth = borderWidth;
-    this.ctx.fillStyle = 'rgb(20, 24, 28)';
-
-    this.ctx.fillRect(x, y, width, height);
-    this.ctx.strokeRect(x, y, width, height);
-
-    this.ctx.fillStyle = 'rgb(250, 40, 40)';
-    this.ctx.font = '900 24px monospace';
-    const measure = this.ctx.measureText(title);
-    this.ctx.fillText(title, x + (width - measure.width) / 2, y + 60);
-
-    const padding = 20;
-    this.ctx.fillStyle = '#c0c4c8';
-    this.ctx.font = 'normal 14px monospace';
-    // this.ctx.textAlign = 'center';
-    this.fillWrapText(this.ctx.font, detail, width - padding * 2, x + padding, y + 100);
-    // this.fillWrapText(this.ctx.font, detail, width - padding * 2, x + padding + (width - padding * 2) / 2, y + 200);
   }
 }
 
