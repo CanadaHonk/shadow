@@ -17,6 +17,8 @@
 - text-align
 - line-height
 - rem unit
+- center element
+- bgColor, fgColor
 - fixed length units (cm, in, etc)
 - max width/max height
 - text wrapping (!)
@@ -28,3 +30,4 @@
 
 - http://home.mcom.com/home/welcome.html (blank?)
 - https://cs.sjoy.lol (text good! styling bad)
+- https://www.stroustrup.com (okay content, not styling)
