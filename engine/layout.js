@@ -617,10 +617,18 @@ export class LayoutNode extends Node {
     return this.lengthAbs(this.css()['margin-bottom'], 'margin-bottom');
   }
   marginLeft() {
-    return this.lengthAbs(this.css()['margin-left'], 'margin-left');
+    const val = this.css()['margin-left'];
+
+    if (val === 'auto') return 0; // todo: actually auto
+
+    return this.lengthAbs(val, 'margin-left');
   }
   marginRight() {
-    return this.lengthAbs(this.css()['margin-right'], 'margin-right');
+    const val = this.css()['margin-right'];
+
+    if (val === 'auto') return 0; // todo: actually auto
+
+    return this.lengthAbs(val, 'margin-right');
   }
 
   borderTopWidth() {
