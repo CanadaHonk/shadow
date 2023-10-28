@@ -7,12 +7,18 @@ import * as AboutPages from './about/index.js';
 
 window._js = JS;
 
+if (window.crossOriginIsolated === false) {
+  console.log('not cross-origin isolated, registering service worker');
+  const worker = await navigator.serviceWorker.register('sw.js');
+  // if (worker.active.state === 'activated') location.reload();
+}
+
 window.version = `2023.10.27`;
 
 const welcome = () => load('about:welcome');
 window.welcome = welcome;
 
-const error = e => console.error(e) || load(`about:error?${btoa(e.stack ?? e)}`, null, false);
+const error = e => console.error(e) || load(`about:error?${btoa(e.stack ?? e)}`);
 window.error = error;
 
 window.onpopstate = ({ state }) => {
@@ -34,6 +40,7 @@ const _load = async (url, baseUrl = null, push = true) => {
     const page = url.slice('about:'.length).split('?')[0];
     const html = AboutPages[page] ? AboutPages[page]({ url }) : `<span>about: page not found</span>`;
     realURL = 'data:text/html;base64,' + btoa(html);
+    push = false;
   }
 
   if (realURL.startsWith('data:')) baseUrl = new URL('/', location.href);
@@ -48,14 +55,14 @@ const _load = async (url, baseUrl = null, push = true) => {
   console.log(html);
 
   const parser = new HTMLParser();
-  const doc = parser.parse(html).process();
+  const doc = parser.parse(html);
   window._doc = doc;
 
   console.log(doc);
 
   doc.page = page;
 
-  const layout = constructLayout(doc, renderer);
+  const layout = await constructLayout(doc, renderer);
   console.log(layout);
 
   const title = layout.querySelector('title');

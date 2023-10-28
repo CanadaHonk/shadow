@@ -1,13 +1,5 @@
-import * as SpiderMonkey from './backends/spidermonkey.js';
-import * as Kiesel from './backends/kiesel.js';
-
 import * as Runner from './ipc/outside.js';
 
-const backends = {
-  kiesel: Kiesel,
-  spidermonkey: SpiderMonkey
-};
-let backend = null;
 export let backendName = null;
 
 export const setBackend = async (name, preload = true) => {
@@ -20,15 +12,11 @@ export const setBackend = async (name, preload = true) => {
 
   backendName = name.toLowerCase();
 
-  backend = backends[backendName];
-
   if (preload) await run(null, '');
 };
 
 export const run = async (doc, js) => {
-  if (!backend) return false;
-
-  await Runner.run(backend, doc, js);
+  await Runner.run(backendName, doc, js);
 
   return true;
 };
