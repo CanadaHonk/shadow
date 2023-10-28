@@ -26,7 +26,7 @@ const backends = {
   spidermonkey: 'engine/js/backends/spidermonkey.js'
 };
 
-let backend = null, document = null;
+let backend = null, lastDocument = 0;
 
 const SERIAL_RES_SIZE = 1024;
 
@@ -38,7 +38,8 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
     return resolve(null);
   }
 
-  if (!backend || backend.name !== backendName || doc !== document) {
+  if (!backend || backend.name !== backendName || doc.ptr !== lastDocument) {
+    lastDocument = doc.ptr;
     if (backend) {
       backend.worker.onmessage = () => {};
       backend.worker.terminate();
