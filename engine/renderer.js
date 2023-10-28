@@ -93,7 +93,8 @@ export class Renderer {
     const frameTimeStart = performance.now();
     const deltaTime = frameTimeStart - lastFrame;
 
-    this.ctx.clearRect(0, scrollY, cWidth, scrollY + cHeight);
+    this.ctx.fillStyle = this.layout.colorAbs('Canvas');
+    this.ctx.fillRect(0, scrollY, cWidth, scrollY + cHeight);
 
     hoverLink = null;
 
