@@ -196,6 +196,25 @@ export class HTMLParser {
             this.tagState = TagState.None;
 
             this.escaping = false;
+
+            if (this.parent.tagName === 'script' || this.parent.tagName === 'style') {
+              const start = i + 1;
+              const endTag = '</' + this.parent.tagName + '>';
+              const end = input.indexOf(endTag, start);
+
+              const text = input.slice(start, end);
+
+              if (text) {
+                const node = new Node('#text', this.document);
+                node.content = text;
+                this.parent.appendChild(node);
+              }
+
+              this.parent = this.parent.parent;
+
+              i = end + endTag.length;
+            }
+
             continue;
           }
 
