@@ -104,4 +104,11 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
 
     backend.handlers.wait = null;
   });
+
+  backend.on('done', () => {
+    backend.send({});
+    backend.handlers.done = null;
+
+    resolve();
+  });
 });
