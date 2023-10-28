@@ -372,6 +372,8 @@ export class LayoutNode extends Node {
       } else val += c;
     }
 
+    unit ||= 'px';
+
     val = parseFloat(val);
 
     switch (unit) {
