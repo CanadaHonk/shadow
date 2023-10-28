@@ -137,15 +137,4 @@ export class Document extends Node {
     super('document', null);
     this.document = this;
   }
-
-  process(node = this) {
-    if (node.tagName === 'style') {
-      node.rules = new CSSParser().parse(node.children[0].content);
-      this.cssRules = this.cssRules.concat(node.rules);
-    }
-
-    for (const x of node.children) this.process(x);
-
-    return this;
-  }
 }

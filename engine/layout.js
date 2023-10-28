@@ -687,9 +687,37 @@ export class LayoutNode extends Node {
     this._cssCache = null;
     this.cache = {};
   }
+
+  async process() {
+    if (this.tagName === 'style') {
+      this.rules = new CSSParser().parse(this.children[0].content);
+      this.document.cssRules = this.document.cssRules.concat(this.rules);
+      this.document.invalidateCaches();
+    }
+
+    // should this be blocking? - yes?
+    if (this.tagName === 'link' && this.attrs.rel === 'stylesheet') {
+      const text = await (await this.document.page.fetch(this.attrs.href)).text();
+      this.rules = new CSSParser().parse(text);
+
+      this.document.cssRules = this.document.cssRules.concat(this.rules);
+      this.document.invalidateCaches();
+    }
+
+    if (this.tagName === 'script') {
+      if (this.attrs.src) {
+        const text = await (await this.document.page.fetch(this.attrs.src)).text();
+        window._js.run(text);
+      }
+
+      window._js.run(this.children[0].content);
+    }
+
+    for (const x of this.children) await x.process();
+  }
 }
 
-export const constructLayout = (document, renderer) => {
+export const constructLayout = async (document, renderer) => {
   const assembleLayoutNodes = x => {
     const a = new LayoutNode(x, renderer);
     a.children = a.children.map(y => assembleLayoutNodes(y));
@@ -724,6 +752,8 @@ export const constructLayout = (document, renderer) => {
     for (const y of x.children.slice()) removeDeadTextNodes(y);
   }
   removeDeadTextNodes(doc);
+
+  await doc.process();
 
   return doc;
 };
