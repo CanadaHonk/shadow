@@ -29,7 +29,9 @@ window.onpopstate = ({ state }) => {
     else welcome();
 };
 
-let renderer, initialLoad = true;
+window.reload = () => load(...lastLoad);
+
+let renderer, initialLoad = true, lastLoad;
 const _load = async (url, baseUrl = null, push = true) => {
   if (!renderer) renderer = new Renderer();
 
@@ -79,7 +81,10 @@ const _load = async (url, baseUrl = null, push = true) => {
   renderer.layout = layout;
 };
 
-const load = (...args) => _load(...args).catch(e => error(e));
+const load = (...args) => {
+  lastLoad = args;
+  return _load(...args).catch(e => error(e));
+};
 window.load = load;
 
 const omniload = query => {
