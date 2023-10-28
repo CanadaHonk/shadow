@@ -1,5 +1,5 @@
 import { Node } from './dom.js';
-import { CSSParser, CSSRule, SelectorType } from './cssparser.js';
+import { CSSParser, CSSRule, SelectorType, CombinatorType } from './cssparser.js';
 
 const uaRaw = globalThis.node ? (await import('fs')).readFileSync(globalThis.uaPath, 'utf8') : await (await fetch('engine/ua.css')).text();
 const uaRules = new CSSParser().parse(uaRaw);
@@ -69,6 +69,10 @@ export class LayoutNode extends Node {
     };
 
     cache('x'); cache('y'); cache('width'); cache('height');
+    // cache('display'); cache('isBlock'); cache('isInline');
+    // cache('contentWidth'); cache('contentHeight');
+    // cache('totalWidth'); cache('totalHeight');
+
     if (this.tagName === 'img') this.image();
   }
 
@@ -76,21 +80,69 @@ export class LayoutNode extends Node {
     return byPtr[ptr];
   }
 
-  matchesCSS(selector) {
-    for (const x of selector) { // a, b, c (a OR b OR c)
-      let match = true;
-      for (const y of x) { // a#b.c (a AND b AND c)
-        if (
-          !(y.type === SelectorType.Tag && this.tagName === y.text) && // tag
-          !(y.type === SelectorType.Id && this.id === y.text) && // id
-          !(y.type === SelectorType.Class && this.hasClass(y.text)) // class
-        ) {
-          match = false;
-          break;
+  testCSSConditions(conds) {
+    for (const x of conds) { // a#b.c (a AND b AND c)
+      if (
+        !(x.type === SelectorType.Tag && this.tagName === x.text) && // tag
+        !(x.type === SelectorType.Id && this.id === x.text) && // id
+        !(x.type === SelectorType.Class && this.hasClass(x.text)) && // class
+        !(x.type === SelectorType.Universal) // universal (*)
+      ) return false;
+    }
+
+    return true;
+  }
+
+  // selectors (a, b, c)
+  //  combinators (a b > c)
+  //   conditions (a#bc)
+  //    condition (#b)
+  matchesCSS(selectors) {
+    let target = this;
+
+    selectorLoop: for (const _combs of selectors) { // a, b, c (a OR b OR c)
+      // reverse so:
+      //   a > b > c (parent --> child)
+      // becomes:
+      //   c > b > a (child --> parent)
+
+      let combs = _combs.slice().reverse(); // slow!
+      const first = combs.shift();
+
+      if (!this.testCSSConditions(first.conds)) continue;
+
+      let lastCType = first.type;
+      target = target.parent;
+      combCheck: for (const comb of combs) {  // c > b a
+        parentCheck: while (target) {
+          switch (lastCType) {
+            case CombinatorType.Descendant: { // a b
+              const match = target.testCSSConditions(comb.conds);
+              lastCType = comb.type;
+
+              target = target.parent;
+              if (match) continue combCheck; // this parent matches, go to next comb
+
+              continue parentCheck;
+            }
+
+            case CombinatorType.Child: { // a > b (direct child)
+              const match = target.testCSSConditions(comb.conds);
+              if (!match) continue selectorLoop; // these combs will not match
+
+              lastCType = comb.type;
+              target = target.parent;
+              continue combCheck;
+            }
+          }
         }
+
+        // no parent matched this comb
+        // these combs will not match
+        continue selectorLoop;
       }
 
-      if (match) return true;
+      return true;
     }
 
     return false;
@@ -145,6 +197,8 @@ export class LayoutNode extends Node {
 
     // apply css rules
     let props = { ...defaultProperties, ...inherited };
+
+    if (this.tagName === '#text') return this._cssCache = props;
 
     for (const x of rules) {
       if (this.matchesCSS(x.selectors)) {
@@ -279,10 +333,13 @@ export class LayoutNode extends Node {
   }
 
   isBlock() {
+    // if we have block children with width: auto, become block
+    if (this.children.some(x => x.isBlock() && x.css().width === 'auto')) return true;
+
     return this.display() === 'block' || this.display() === 'list-item';
   }
   isInline() {
-    return this.display() === 'inline';
+    return !this.isBlock();
   }
 
   // technically <length-percentage> but uhm yeah
@@ -375,19 +432,11 @@ export class LayoutNode extends Node {
       return this.parent.contentWidth() - this.horizontalSpace(true);
     }
 
-    // todo: this presumes everything is just on one row !!
-    // how the heck to fix?
-
     let width = 0;
     for (const x of this.children) {
       width += x.width();
     }
     return width;
-
-    // take up our content width
-    // todo: children (!!!!)
-
-    // text
   }
 
   contentHeight() {
@@ -400,12 +449,6 @@ export class LayoutNode extends Node {
     if (this.tagName === 'img') return this._image?.height ?? 0;
 
     if (true) {
-    // if (this.isBlock()) {
-      // min content?
-
-      // todo: this presumes everything is just on one column !!
-      // how the heck to fix?
-
       let height = 0, inlineBlock = 0;
       for (const x of this.children) {
         if (x.isBlock()) {

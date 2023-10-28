@@ -15,7 +15,15 @@ export const SelectorType = {
   Tag: 0,
   Id: 1,
   Class: 2,
+  Universal: 3,
 };
+
+export const CombinatorType = {
+  Descendant: 0,
+  Child: 1,
+};
+
+const isspace = c => c === ' ';
 
 export class CSSRule {
   selectors = [];
@@ -28,26 +36,57 @@ export class CSSRule {
     for (let x of input.split(',')) {
       x = x.trim();
 
-      let type = SelectorType.Tag;
+      let cType = CombinatorType.Descendant;
+      let sType = SelectorType.Tag;
       let text = '';
 
       const sels = [];
+      let conds = [];
+
+      const pushCond = () => {
+        if (text || sType === SelectorType.Universal) conds.push({ type: sType, text });
+        sType = SelectorType.Tag;
+        text = '';
+      };
+
+      const isCombinator = c => [' ', '>'].includes(c);
+
       for (let i = 0; i < x.length; i++) {
         const c = x[i];
 
-        if (c === '#' || c === '.' || i === x.length - 1) {
-          if (i === x.length - 1) text += c;
+        // if (x.includes'#a > div') console.log({c, text, conds, cType, sType});
 
-          if (text) sels.push({ type, text });
+        if (isCombinator(c) && text && (c !== ' ' || (!isCombinator(x[i + 1]) && !isspace(x[i + 1])))) {
+          pushCond();
 
-          if (c === '#') type = SelectorType.Id;
-          if (c === '.') type = SelectorType.Class;
+          sels.push({ type: cType, conds });
+          conds = [];
+
+          if (c === ' ') cType = CombinatorType.Descendant;
+          if (c === '>') cType = CombinatorType.Child;
 
           continue;
         }
 
-        text += c;
+        if (['#', '.', '*'].includes(c) || i === x.length - 1) {
+          if (i === x.length - 1) text += c;
+
+          if (c === '*') sType = SelectorType.Universal;
+          pushCond();
+
+          if (c === '#') sType = SelectorType.Id;
+          if (c === '.') sType = SelectorType.Class;
+
+          continue;
+        }
+
+        if (!isspace(c)) text += c;
       }
+
+      if (conds.length > 0) sels.push({ type: cType, conds });
+
+      const TS = combs => combs.reduce((acc, x) => acc + `${x.type === 0 ? ' ' : ' > '}${x.conds[0]?.type === 0 ? '' : '#'}${x.conds[0]?.text}`, '').trim();
+      if (x.includes('*')) console.log(x, '|', sels, TS(sels));
 
       out.push(sels);
     }
@@ -111,8 +150,6 @@ export class CSSParser {
 
       return false;
     };
-
-    const isspace = c => c === ' ';
 
     input = input.replace(/\/\*[\w\W]*?\*\//g, '');
 
