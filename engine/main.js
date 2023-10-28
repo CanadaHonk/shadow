@@ -12,7 +12,7 @@ window.version = `2023.10.27`;
 const welcome = () => load('about:welcome');
 window.welcome = welcome;
 
-const error = e => console.error(e) || load(`about:error?${btoa(e.stack ?? e)}`);
+const error = e => console.error(e) || load(`about:error?${btoa(e.stack ?? e)}`, null, false);
 window.error = error;
 
 window.onpopstate = ({ state }) => {
