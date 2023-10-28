@@ -52,6 +52,12 @@ globalThis.document = {
   }
 };
 
+globalThis.alert = msg => {
+  ipc.send({ f: 'alert', msg });
+};
+
+globalThis.window = globalThis;
+
 ipc.send({ type: 'ready' });
 
 while (true) {

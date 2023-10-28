@@ -13,6 +13,11 @@ const funcs = {
     const el = doc.getFromPtr(ptr);
     el.textContent = value;
     send({ value: el.textContent });
+  },
+
+  'alert': ({ msg }, send) => {
+    alert(msg);
+    send({});
   }
 };
 
