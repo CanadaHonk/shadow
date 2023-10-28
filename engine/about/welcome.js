@@ -64,8 +64,8 @@ export default () => `<title>&lt;shadow&gt;</title>
 <p>bonus: <b>you can choose which JS engine to use!</b></p>
 
 <ul>
-<li><a href="https://spidermonkey.dev">SpiderMonkey</a> (Firefox's JS engine)</li>
-<li><a href="https://kiesel.dev">Kiesel</a> (a WIP engine from scratch in Zig)</li>
+<li><a href="https://spidermonkey.dev" target="_parent">SpiderMonkey</a> (Firefox's JS engine)</li>
+<li><a href="https://kiesel.dev" target="_parent">Kiesel</a> (a WIP engine from scratch in Zig)</li>
 </ul>
 
 <button onclick="let el = document.querySelector('#counter'); el.textContent = parseInt(el.textContent) + 1">click me!</button>&nbsp;<span id="counter">0</span><noscript dynamic=true>(you have JS disabled, press J)</noscript>
@@ -74,8 +74,8 @@ export default () => `<title>&lt;shadow&gt;</title>
 <ul>
 <li>tip: use browser controls (icons or alt+arrow key) to navigate forward/backward in history</li>
 <li>tip: ctrl+click a link to open in new tab (actual browser)</li>
-<li><a href="engine/ua.css" target="_parent">UA stylesheet</a> (external)</li>
-<li><a href="https://github.com/CanadaHonk/shadow" target="_parent">source code</a> (external)</li>
+<li><a href="engine/ua.css" target="_parent">UA stylesheet</a></li>
+<li><a href="https://github.com/CanadaHonk/shadow" target="_parent">source code</a></li>
 </ul>
 
 <h2>implemented</h2>
