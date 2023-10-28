@@ -28,7 +28,7 @@ const backends = {
 
 let backend = null, lastDocument = 0;
 
-const SERIAL_RES_SIZE = 1024;
+const SERIAL_RES_SIZE = 1024 * 1024 * 10;
 
 export const run = (backendName, doc, _js) => new Promise(async resolve => {
   if (backendName === null) return resolve(null);

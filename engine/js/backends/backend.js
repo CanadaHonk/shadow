@@ -1,6 +1,6 @@
 const decoder = new TextDecoder('utf8');
 
-const SERIAL_RES_SIZE = 1024;
+const SERIAL_RES_SIZE = 1024 * 1024 * 10;
 const decodeBuffer = new Uint8Array(SERIAL_RES_SIZE);
 
 let lengthBuffer, lengthTyped, valueBuffer, valueTyped;
