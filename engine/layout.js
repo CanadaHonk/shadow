@@ -619,7 +619,9 @@ export class LayoutNode extends Node {
   marginLeft() {
     const val = this.css()['margin-left'];
 
-    if (val === 'auto') return 0; // todo: actually auto
+    if (val === 'auto') {
+      return (this.parent.width() - this.width()) / 2;
+    }
 
     return this.lengthAbs(val, 'margin-left');
   }
