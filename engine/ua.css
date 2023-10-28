@@ -110,9 +110,9 @@ dir, menu, ul {
   list-style-type: disc;
 }
 
-:is(dir, menu, ol, ul) :is(dir, menu, ul) {
+/* :is(dir, menu, ol, ul) :is(dir, menu, ul) {
   list-style-type: circle;
 }
 :is(dir, menu, ol, ul) :is(dir, menu, ol, ul) :is(dir, menu, ul) {
   list-style-type: square;
-}
+} */
