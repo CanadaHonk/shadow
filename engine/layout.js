@@ -719,10 +719,11 @@ export class LayoutNode extends Node {
     if (this.tagName === 'script') {
       if (this.attrs.src) {
         const text = await (await this.document.page.fetch(this.attrs.src)).text();
-        window._js.run(text);
+        await window._js.run(text);
       }
 
-      window._js.run(this.children[0].content);
+      const content = this.children[0]?.content;
+      if (content) await window._js.run(content);
     }
 
     for (const x of this.children) await x.process();
