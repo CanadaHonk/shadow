@@ -340,6 +340,9 @@ document.onkeyup = e => {
     const current = window._js.backendName;
     const backends = [ null, 'spidermonkey', 'kiesel' ];
     window._js.setBackend(backends[(backends.indexOf(current) + 1) % 3]);
+
+    // reload page
+    window.reload();
   }
 };
 
