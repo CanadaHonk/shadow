@@ -89,7 +89,7 @@ export class HTMLParser {
 
     const isVoidEl = (name = this.currentName) => VOID_ELEMENTS.includes(name);
 
-    input = input.replace(/<!DOCTYPE .*?>/i, '');
+    input = input.replace(/<!DOCTYPE .*?>/i, '').replace(/<!--[\w\W]*?-->/g, '');
 
     for (let i = 0; i < input.length; i++) {
       const peek = () => input[i + 1];
