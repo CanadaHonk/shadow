@@ -21,5 +21,6 @@ body {
 h1 {
   color: rgb(250, 40, 40);
 }
+</style>
 </body>`;
 };
