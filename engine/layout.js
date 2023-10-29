@@ -1,5 +1,6 @@
 import { Node } from './dom.js';
 import { CSSParser, CSSRule, SelectorType, CombinatorType } from './cssparser.js';
+import { HTMLParser } from './htmlparser.js';
 
 const uaRaw = globalThis.node ? (await import('fs')).readFileSync(globalThis.uaPath, 'utf8') : await (await fetch('engine/ua.css')).text();
 const uaRules = new CSSParser().parse(uaRaw);
@@ -682,6 +683,123 @@ export class LayoutNode extends Node {
     text.content = value.toString();
 
     this.appendChild(text);
+  }
+
+  get innerHTML() {
+    // https://html.spec.whatwg.org/#escapingString
+    const escapeString = (str, attribute = false) => {
+      // Replace any occurrence of the "&" character by the string "&amp;".
+      str = str.replaceAll('&', '&amp;');
+
+      // Replace any occurrences of the U+00A0 NO-BREAK SPACE character by the string "&nbsp;".
+      str = str.replaceAll('\u00A0', '&nbsp;');
+
+      if (attribute) {
+        // If the algorithm was invoked in the attribute mode,
+        // replace any occurrences of the """ character by the string "&quot;"
+        str = str.replaceAll('"', '&quot;');
+      } else {
+        // If the algorithm was not invoked in the attribute mode,
+        // replace any occurrences of the "<" character by the string "&lt;",
+        // and any occurrences of the ">" character by the string "&gt;"
+        str = str.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+      }
+
+      return str;
+    };
+
+    // https://html.spec.whatwg.org/#serialising-html-fragments
+    // 1. If the node serializes as void, then return the empty string.
+    if (this.voidElement) return '';
+
+    // 2. Let s be a string, and initialize it to the empty string.
+    let s = '';
+
+    // 4. For each child node of the node, in tree order, run the following steps:
+    for (const child of this.children) {
+      if (child.tagName === '#text') {
+        // If current node is a Text node
+        if (
+          // If the parent of current node is a style, script, xmp, iframe, noembed, noframes, or plaintext element
+          ['style', 'script', 'xmp', 'iframe', 'noembed', 'noframes', 'plaintext'].includes(this.tagName) ||
+
+          // todo: or if the parent of current node is a noscript element and scripting is enabled for the node
+          false
+        ) {
+          s += child.content;
+        } else {
+          s += escapeString(child.content);
+        }
+
+        continue;
+      }
+
+      // Append a U+003C LESS-THAN SIGN character (<), followed by tagname.
+      s += '<' + child.tagName;
+
+      // For each attribute that the element has
+      for (const attr in child.attrs) {
+        // append a U+0020 SPACE character
+        s += ' ';
+
+        // the attribute's (serialized) name
+        s += attr;
+
+        // a U+003D EQUALS SIGN character (=), a U+0022 QUOTATION MARK character (")
+        s += '="';
+
+        // the attribute's value, escaped as described below in attribute mode
+        s += escapeString(child.attrs[attr]);
+
+        // and a second U+0022 QUOTATION MARK character (").
+        s += '"';
+      }
+
+      // Append a U+003E GREATER-THAN SIGN character (>).
+      s += '>';
+
+      // If current node serializes as void, then continue on to the next child node at this point.
+      if (!child.voidElement) {
+        // Append the value of running the HTML fragment serialization algorithm on the current node element
+        s += child.innerHTML;
+
+        // followed by a U+003C LESS-THAN SIGN character (<), a U+002F SOLIDUS character (/)
+        s += '</';
+
+        // tagname again
+        s += child.tagName;
+
+        // and finally a U+003E GREATER-THAN SIGN character (>)
+        s += '>';
+      }
+    }
+
+    return s;
+  }
+
+  set innerHTML(value) {
+    const parser = new HTMLParser();
+    const dom = parser.parse(value, false);
+
+    this.children = [];
+
+    const process = x => {
+      x = new LayoutNode(x, this.renderer);
+      x.document = this.document;
+
+      x.children = x.children.map(y => {
+        const z = process(y);
+        z.parent = x;
+        return z;
+      });
+
+      return x;
+    };
+    const layout = process(dom);
+
+    for (const x of layout.children) {
+      this.appendChild(x);
+    }
   }
 
   invalidateCaches(sub = false) {
