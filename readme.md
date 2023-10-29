@@ -1,6 +1,6 @@
 # shadow
 
-Shadow is a new novel web engine made entirely in JS (mostly) from scratch.
+Shadow is a new novel browser engine made entirely in JS (mostly) from scratch.
 
 ## [open it!](https://shadow.goose.icu)
 (more info there)
@@ -22,8 +22,9 @@ Shadow is a new novel web engine made entirely in JS (mostly) from scratch.
 - max width/max height
 - text wrapping (!)
 - text highlighting (!)
-- popups when using keybinds to notify info
-- inspect dom tree panel
+* popups when using keybinds to notify info
+* inspect dom tree panel
+* setting for how early but broken or late but good to show a page
 
 ### to investigate
 
