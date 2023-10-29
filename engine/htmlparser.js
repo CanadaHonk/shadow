@@ -286,7 +286,7 @@ export class HTMLParser {
     cleanup(this.document);
 
     // add <html> if not there
-    if (autoParent && this.document.childElements[0].tagName !== 'html') {
+    if (autoParent && this.document.childElements[0]?.tagName !== 'html') {
       const x = new Node('html', this.document);
       x.children = [...this.document.children];
       this.document.children = [x];
