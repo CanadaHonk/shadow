@@ -874,6 +874,21 @@ export class LayoutNode extends Node {
   }
 }
 
+const removeDeadTextNodes = x => {
+  // if (x.tagName === '#text' && x.displayContent() === '') {
+  // if (x.tagName === '#text' && x.parent.tagName === 'body') console.log(x.content, x.content.trim() === '');
+  if (x.tagName === '#text' && x.content.trim() === '') {
+    if (x.content.length > 0 && x.siblingAfter && x.siblingBefore?.isInline?.() && x.siblingAfter.isInline()) {
+      const t = x.siblingAfter.textNode();
+      if (t && !t.content.startsWith(' ')) t.content = ' ' + t.content;
+    }
+
+    x.remove();
+  }
+
+  for (const y of x.children.slice()) removeDeadTextNodes(y);
+};
+
 export const constructLayout = async (document, renderer) => {
   const assembleLayoutNodes = x => {
     const a = new LayoutNode(x, renderer);
@@ -894,20 +909,6 @@ export const constructLayout = async (document, renderer) => {
   };
   reSetDoc(doc);
 
-  const removeDeadTextNodes = x => {
-    // if (x.tagName === '#text' && x.displayContent() === '') {
-    // if (x.tagName === '#text' && x.parent.tagName === 'body') console.log(x.content, x.content.trim() === '');
-    if (x.tagName === '#text' && x.content.trim() === '') {
-      if (x.content.length > 0 && x.siblingAfter && x.siblingBefore?.isInline?.() && x.siblingAfter.isInline()) {
-        const t = x.siblingAfter.textNode();
-        if (t && !t.content.startsWith(' ')) t.content = ' ' + t.content;
-      }
-
-      x.remove();
-    }
-
-    for (const y of x.children.slice()) removeDeadTextNodes(y);
-  }
   removeDeadTextNodes(doc);
 
   await doc.process();
