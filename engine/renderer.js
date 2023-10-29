@@ -44,6 +44,7 @@ export class Renderer {
         _update();
       } catch (e) {
         error(e);
+        requestAnimationFrame(this.update);
       }
     }).bind(this);
     this.update();
