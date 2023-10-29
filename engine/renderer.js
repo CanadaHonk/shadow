@@ -184,6 +184,8 @@ export class Renderer {
         // this.ctx.fillRect(x, y, width, height);
       }
 
+      if (_.tagName === 'iframe') draw(_.contentDocument, depth + 1);
+
       for (const z of _.children) draw(z, depth + 1);
     };
     draw(this.layout);
