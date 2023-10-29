@@ -1,5 +1,3 @@
-import { CSSParser } from './cssparser.js';
-
 export class Node {
   tagName = '';
   parent = null;
