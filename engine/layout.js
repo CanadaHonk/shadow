@@ -76,6 +76,8 @@ export class LayoutNode extends Node {
     cache('color'); cache('backgroundColor');
     cache('contentWidth'); cache('contentHeight');
     cache('totalWidth'); cache('totalHeight');
+    cache('marginTop'); cache('marginBottom'); cache('marginLeft'); cache('marginRight');
+    cache('paddingTop'); cache('paddingBottom'); cache('paddingLeft'); cache('paddingRight');
     cache('displayContent');
     cache('colorScheme');
 
