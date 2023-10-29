@@ -32,7 +32,6 @@ const loadWasm = async url => {
 };
 
 export default async (url, args) => {
-  const isSM = url.includes('firefoxci'); // hack
   const js = await (await fetch('/engine/js/ipc/inside.js')).text();
   const wasmModule = await loadWasm(url);
 
