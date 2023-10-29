@@ -36,6 +36,8 @@ const _load = async (url, baseUrl = null, push = true) => {
   if (!renderer) renderer = new Renderer();
 
   // wipe current page
+  _js.stopAll();
+
   const mock = new LayoutNode({}, renderer);
   mock.document = { cssRules: [] };
 
