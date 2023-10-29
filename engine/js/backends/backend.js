@@ -32,6 +32,7 @@ const loadWasm = async url => {
 };
 
 export default async (url, args) => {
+  const isSM = url.includes('firefoxci'); // hack
   const js = await (await fetch('/engine/js/ipc/inside.js')).text();
   const wasmModule = await loadWasm(url);
 
@@ -93,16 +94,15 @@ export default async (url, args) => {
             decodeBuffer[i] = Atomics.load(valueTyped, i);
           }
 
-          const reply = decoder.decode(decodeBuffer.slice(0, length));
+          const _reply = decoder.decode(decodeBuffer.slice(0, length));
           // console.log('worker postmessage reply', reply);
 
-
+          let reply = _reply;
           if (reply.startsWith('{"type":"eval')) {
-            wasmFs.fs.writeFileSync('/comm', 'JS|' + JSON.parse(reply).js + '\n');
-          } else {
-            wasmFs.fs.writeFileSync('/comm', reply + '\n');
+            reply = 'JS|' + JSON.parse(_reply).js;
           }
 
+          wasmFs.fs.writeFileSync('/comm', reply + '\n');
           wasmFs.fs.appendFileSync('/dev/stdin', 'A\n');
         }
       }
