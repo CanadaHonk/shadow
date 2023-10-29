@@ -1,4 +1,5 @@
 const days = new Date(new Date() - new Date('2023-10-23')).getDate();
+const weeks = Math.floor(days / 7);
 
 const demos = [
   [ 'https://serenityos.org', 'looks pretty good' ],

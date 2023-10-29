@@ -450,6 +450,28 @@ export class LayoutNode extends Node {
     return y;
   }
 
+  imageRatio() {
+    return (this._image?.width || 1) / (this._image?.height || 1);
+  }
+
+  imageWidth() {
+    if (this.attrs.width) return this.lengthAbs(this.attrs.width, 'width-attr');
+    if (this.attrs.height) {
+      return this.imageRatio() * this.lengthAbs(this.attrs.height, 'height-attr');
+    }
+
+    return this._image?.width ?? 0;
+  }
+
+  imageHeight() {
+    if (this.attrs.height) return this.lengthAbs(this.attrs.height, 'height-attr');
+    if (this.attrs.width) {
+      return this.lengthAbs(this.attrs.width, 'width-attr') / this.imageRatio();
+    }
+
+    return this._image?.height ?? 0;
+  }
+
   contentWidth() {
     if (this.tagName === 'document') return this.renderer.canvas.width;
 
@@ -458,7 +480,7 @@ export class LayoutNode extends Node {
       return this.lengthAbs(this.css().width, 'width');
     }
 
-    if (this.tagName === 'img') return this._image?.width ?? 0;
+    if (this.tagName === 'img') return this.imageWidth();
 
     if (this.isBlock()) {
       // take up as much as we can?
@@ -479,7 +501,7 @@ export class LayoutNode extends Node {
       return this.lengthAbs(this.css().height, 'height');
     }
 
-    if (this.tagName === 'img') return this._image?.height ?? 0;
+    if (this.tagName === 'img') return this.imageHeight();
 
     if (true) {
       let height = 0, inlineBlock = 0;
