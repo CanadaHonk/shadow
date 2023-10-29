@@ -1,43 +1,53 @@
 // JS WORLD
-const evalQueue = [];
-const ipc = {
-  send: (msg, ignoreEval) => {
-    if (globalThis.Kiesel) {
-      Kiesel.print(msg, { pretty: true });
-    } else {
-      print(JSON.stringify(msg));
-    }
-
-    return ipc.recv(ignoreEval ?? true);
-  },
-
-  recv: (ignoreEval) => {
-    while (true) {
-      const read = globalThis.Kiesel ? Kiesel.readLine() : readline();
-      if (!read) continue;
-
-      // console.log('wow', str);
-
-      let msg;
-      const str = os.file.readFile('/comm');
-
-      if (str.startsWith('JS|')) msg = { type: 'eval', js: str.slice(3) };
-
-      if (!msg) msg = JSON.parse(str);
-
-      if (msg.type === 'eval') { // if eval
-        evalQueue.push(msg); // push to queue
-        if (ignoreEval) continue; // continue if ignoring
+if (typeof ipc === 'undefined') {
+  globalThis.evalQueue = [];
+  globalThis.ipc = {
+    send: (msg, ignoreEval) => {
+      if (globalThis.Kiesel) {
+        Kiesel.print(msg, { pretty: true });
+      } else {
+        print(JSON.stringify(msg));
       }
 
-      return msg;
+      return ipc.recv(ignoreEval ?? true);
+    },
+
+    recv: (ignoreEval) => {
+      while (true) {
+        const read = globalThis.Kiesel ? Kiesel.readLine() : readline();
+        if (!read) continue;
+
+        // console.log('wow', str);
+
+        let msg;
+        const str = os.file.readFile('/comm');
+
+        if (str.startsWith('JS|')) msg = { type: 'eval', js: str.slice(3) };
+
+        if (!msg) msg = JSON.parse(str);
+
+        if (msg.type === 'eval') { // if eval
+          evalQueue.push(msg); // push to queue
+          if (ignoreEval) continue; // continue if ignoring
+        }
+
+        return msg;
+      }
     }
-  }
-};
+  };
+}
 
 class Element {
   constructor(data) {
     Object.assign(this, data);
+  }
+
+  get className() {
+    return ipc.send({ f: 'Element.getClassName', ptr: this.ptr }).value;
+  }
+
+  set className(value) {
+    ipc.send({ f: 'Element.setClassName', value, ptr: this.ptr });
   }
 
   get textContent() {
@@ -55,15 +65,37 @@ class Element {
   set innerHTML(value) {
     ipc.send({ f: 'Element.setInnerHTML', value, ptr: this.ptr });
   }
+
+  get contentDocument() {
+    return new Element(ipc.send({ f: 'Element.getContentDocument', ptr: this.ptr }));
+  }
+
+  // todo: ensure document only, return values?
+  open() {
+    ipc.send({ f: 'Document.open', ptr: this.ptr });
+  }
+
+  write(value) {
+    ipc.send({ f: 'Document.write', value, ptr: this.ptr });
+  }
+
+  close() {
+    ipc.send({ f: 'Document.close', ptr: this.ptr });
+  }
 }
+
+const makeEl = ({ ptr }) => {
+  if (!ptr) return null;
+  return new Element({ ptr });
+};
 
 globalThis.document = {
   querySelector(selector) {
-    return new Element(ipc.send({ f: 'document.querySelector', selector }));
+    return makeEl(ipc.send({ f: 'document.querySelector', selector }));
   },
 
   getElementById(id) {
-    return new Element(ipc.send({ f: 'document.getElementById', id }));
+    return makeEl(ipc.send({ f: 'document.getElementById', id }));
   }
 };
 
@@ -71,7 +103,33 @@ globalThis.alert = msg => {
   ipc.send({ f: 'alert', msg });
 };
 
+globalThis.parent = new Proxy({}, {
+  get(target, prop) {
+    // hack!! presume they want a function
+    return (...args) => ipc.send({ f: 'parent', prop, args }).value;
+  }
+});
+
 globalThis.window = globalThis;
+
+Object.defineProperty(globalThis, 'location', {
+  get() {
+    const href = ipc.send({ f: 'location.getHref' }).value;
+
+    // todo: setters here
+    const obj = {
+      toString: () => href,
+      search: href.slice(href.indexOf('?'))
+    };
+
+    return obj;
+  },
+
+  // location = 'https://example.com'
+  set(value) {
+    ipc.send({ f: 'location.setHref', value });
+  }
+});
 
 // todo: make our own modern-er impl of this. temporary as we have bigger problems atm lol.
 /* Implementation of HTML Timers (setInterval/setTimeout) based on sleep.
@@ -279,21 +337,34 @@ function makeWindowTimer(target, sleep) {
   };
 }
 
-let timerLoop = makeWindowTimer(globalThis, ms => sleep(ms / 1000));
+if (globalThis.setTimeout) {
+  ipc.send({ type: 'ready' });
 
-ipc.send({ type: 'ready' });
+  setInterval(() => {
+    ipc.send({ type: 'wait' }, false);
 
-while (true) {
-  timerLoop(true);
+    if (evalQueue.length === 0) return;
 
-  ipc.send({ type: 'wait' }, false);
+    const ret = (0, eval)(evalQueue.pop().js);
+    ipc.send({ type: 'done', ret });
+  }, 100);
+} else {
+  let timerLoop = makeWindowTimer(globalThis, ms => sleep(ms / 1000));
 
-  if (evalQueue.length === 0) continue;
+  ipc.send({ type: 'ready' });
 
-  // while (evalQueue.length === 0) console.log('while no eval queue') || ipc.recv(false);
+  while (true) {
+    timerLoop(true);
 
-  // console.log('evaling');
+    ipc.send({ type: 'wait' }, false);
 
-  const ret = eval(evalQueue.pop().js);
-  ipc.send({ type: 'done', ret });
+    if (evalQueue.length === 0) continue;
+
+    // while (evalQueue.length === 0) console.log('while no eval queue') || ipc.recv(false);
+
+    // console.log('evaling');
+
+    const ret = eval(evalQueue.pop().js);
+    ipc.send({ type: 'done', ret });
+  }
 }

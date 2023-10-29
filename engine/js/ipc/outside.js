@@ -2,13 +2,23 @@ const funcs = {
   // todo: error/not found handling
   'document.querySelector': ({ selector }, send, doc) => {
     const el = doc.querySelector(selector);
-    send({ ptr: el.ptr });
+    send({ ptr: el?.ptr });
   },
 
   'document.getElementById': ({ id }, send, doc) => {
-    console.log({ id });
     const el = doc.allChildren().find(x => x.id === id);
-    send({ ptr: el.ptr });
+    send({ ptr: el?.ptr });
+  },
+
+  'Element.getClassName': ({ ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    send({ value: el.className });
+  },
+
+  'Element.setClassName': ({ value, ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    el.className = value;
+    send({ value: el.className });
   },
 
   'Element.getTextContent': ({ ptr }, send, doc) => {
@@ -30,7 +40,52 @@ const funcs = {
   'Element.setInnerHTML': ({ value, ptr }, send, doc) => {
     const el = doc.getFromPtr(ptr);
     el.innerHTML = value;
-    send({ value: el.innerHTML });
+    send({});
+    // send({ value: el.innerHTML });
+  },
+
+  'Element.getContentDocument': ({ ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    send({ ptr: el.contentDocument.ptr });
+  },
+
+  // todo: ensure document only, return values?
+  'Document.open': ({ ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    el.open();
+    send({});
+  },
+
+  'Document.write': ({ value, ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    el.write(value);
+    send({});
+  },
+
+  'Document.close': ({ ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    el.close();
+    send({});
+  },
+
+  'parent': async ({ prop, args }, send, doc) => {
+    const parentInstance = instances[doc.parentDocument?.ptr];
+    if (!parentInstance) return send({});
+
+    const value = await run(parentInstance.name, doc.parentDocument, `${prop}(${args.join(',')})`);
+
+    send({ value });
+  },
+
+  // todo: this is not subframe friendly and hacky global
+  'location.getHref': ({}, send) => {
+    send({ value: window._location.url });
+  },
+
+  'location.setHref': ({ value }, send, doc) => {
+    const href = doc.page.resolve(value).toString();
+    window.load(href);
+    send({});
   },
 
   'alert': ({ msg }, send) => {
@@ -41,12 +96,37 @@ const funcs = {
 
 const backends = {
   kiesel: 'engine/js/backends/kiesel.js',
-  spidermonkey: 'engine/js/backends/spidermonkey.js'
+  spidermonkey: 'engine/js/backends/spidermonkey.js',
+  host: 'engine/js/backends/host.js'
 };
 
-let backend = null, lastDocument = 0;
+const instances = {};
 
 const SERIAL_RES_SIZE = 1024 * 1024 * 10;
+
+export const stopAll = () => {
+  for (const x in instances) {
+    if (x.worker) {
+      x.worker.onmessage = () => {};
+      x.worker.terminate();
+    }
+
+    delete instances[x];
+  }
+};
+
+export const stop = doc => {
+  let backend = instances[doc.ptr];
+
+  console.log('stop backend', doc.ptr);
+
+  if (backend) {
+    backend.worker.onmessage = () => {};
+    backend.worker.terminate();
+  }
+
+  delete instances[doc.ptr];
+};
 
 export const run = (backendName, doc, _js) => new Promise(async resolve => {
   if (backendName === null || !_js) return resolve(null);
@@ -56,8 +136,10 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
     return resolve(null);
   }
 
-  if (!backend || backend.name !== backendName || doc.ptr !== lastDocument) {
-    lastDocument = doc.ptr;
+  let backend = instances[doc.ptr];
+
+  if (!backend || backend.name !== backendName) {
+    console.log('new backend', doc.ptr, backendName, Object.keys(instances).length);
     if (backend) {
       backend.worker.onmessage = () => {};
       backend.worker.terminate();
@@ -67,6 +149,8 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
       name: backendName,
       handlers: {}
     };
+
+    instances[doc.ptr] = backend;
 
     backend.worker = new Worker(backends[backendName], { type: 'module' });
 
@@ -82,9 +166,8 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
     backend.worker.postMessage({ lengthBuffer, valueBuffer });
 
     backend.worker.onmessage = e => {
-      // console.log('main recv', e.data);
-
       const msg = e.data;
+      // if (msg.type !== 'wait') console.log('main recv', msg);
       if (backend.handlers[msg.type]) {
         backend.handlers[msg.type](msg);
       } else if (msg.f) {
@@ -93,7 +176,7 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
     };
 
     backend.send = msg => {
-      // console.log('main send', msg);
+      // if (msg.type) console.log('main send', msg);
 
       // const encodeBuffer = new Uint8Array(SERIAL_RES_SIZE);
 
@@ -119,7 +202,7 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
   }
 
   const js = _js.slice().trim();
-  console.log({ js });
+  // console.log({ js });
 
   backend.on('wait', () => {
     backend.send({ type: 'eval', js });

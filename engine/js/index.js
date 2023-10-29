@@ -15,8 +15,14 @@ export const setBackend = async (name, preload = true) => {
   if (preload) await run(null, '');
 };
 
+export const stop = doc => Runner.stop(doc);
+export const stopAll = () => Runner.stopAll();
+
 export const run = async (doc, js) => {
   await Runner.run(backendName, doc, js);
 
   return true;
 };
+
+// setBackend('spidermonkey');
+setBackend('host');
