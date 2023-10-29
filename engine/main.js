@@ -53,6 +53,8 @@ const _load = async (url, baseUrl = null, push = true) => {
 
   if (realURL.startsWith('data:')) baseUrl = new URL('/', location.href);
 
+  window._location = { url, realURL, baseUrl };
+
   history[push && !initialLoad ? 'pushState' : 'replaceState']({ url, baseUrl: baseUrl?.toString?.() }, '', '?' + (baseUrl ? '' : url));
 
   const page = new Page(realURL);
