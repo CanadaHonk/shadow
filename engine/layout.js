@@ -76,7 +76,7 @@ export class LayoutNode extends Node {
     // cache('contentWidth'); cache('contentHeight');
     // cache('totalWidth'); cache('totalHeight');
 
-    if (this.tagName === 'img') this.image();
+    if (this.tagName === 'img') this.loadImage();
   }
 
   getFromPtr(ptr) {
@@ -636,24 +636,27 @@ export class LayoutNode extends Node {
   }
 
   _image;
-  async image() {
-    if (this._image !== undefined) return this._image;
+  async loadImage() {
+    if (this._image !== undefined) return;
 
     this._image = null;
 
-    const data = await (await this.document.page.fetch(this.attrs.src)).arrayBuffer();
+    const res = await this.document.page.fetch(this.attrs.src);
+    const type = res.headers.get('Content-Type');
+    const data = await res.arrayBuffer();
 
-    const blob = new Blob([ new Uint8Array(data) ]);
+    const blob = new Blob([ new Uint8Array(data) ], { type });
 
-    this._image = new Image();
-    this._image.src = URL.createObjectURL(blob);
+    const image = new Image();
+    image.src = URL.createObjectURL(blob);
 
-    this._image.style.display = 'none';
-    document.body.appendChild(this._image);
+    image.style.display = 'none';
+    document.body.appendChild(image);
 
-    this._image.onload = () => this.invalidateCaches();
-
-    return this._image;
+    image.onload = () => {
+      this._image = image;
+      this.invalidateCaches();
+    };
   }
 
   marginTop() {
