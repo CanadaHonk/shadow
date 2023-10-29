@@ -328,7 +328,7 @@ document.onkeyup = e => {
   if (k === 'z') debug = false;
   if (k === 'x') {
     window.colorScheme = window.colorScheme === 'light' ? 'dark' : 'light';
-    window._renderer.layout.invalidateCaches();
+    window._renderer?.layout?.invalidateCaches?.();
   }
 
   if (k === 'c') {
