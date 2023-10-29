@@ -324,7 +324,8 @@ export class LayoutNode extends Node {
         if (trimStart) content = content.trimStart();
         if (trimEnd) content = content.trimEnd();
 
-        content = content.replaceAll('&gt;', '>').replaceAll('&lt;', '<');
+        content = content.replaceAll('&gt;', '>').replaceAll('&lt;', '<').replaceAll('&quot;', '"').replaceAll('&apos;', '\'')
+          .replace(/&#(x?)([A-Za-z0-9]+);/, (_, hex, digits) => String.fromCodePoint(hex ? parseInt(digits, 16) : digits));
 
         return content.replace(/[\t\n\r]/g, ' ').replace(/ {2,}/g, ' ').replaceAll('&nbsp;', ' ');
 
