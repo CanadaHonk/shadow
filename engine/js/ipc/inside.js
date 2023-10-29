@@ -3,24 +3,18 @@ if (typeof ipc === 'undefined') {
   globalThis.evalQueue = [];
   globalThis.ipc = {
     send: (msg, ignoreEval) => {
-      if (globalThis.Kiesel) {
-        Kiesel.print(msg, { pretty: true });
-      } else {
-        print(JSON.stringify(msg));
-      }
+      print(JSON.stringify(msg));
 
       return ipc.recv(ignoreEval ?? true);
     },
 
     recv: (ignoreEval) => {
       while (true) {
-        const read = globalThis.Kiesel ? Kiesel.readLine() : readline();
+        const read = readline();
         if (!read) continue;
 
-        // console.log('wow', str);
-
         let msg;
-        const str = os.file.readFile('/comm');
+        const str = readfile('/comm');
 
         if (str.startsWith('JS|')) msg = { type: 'eval', js: str.slice(3) };
 
@@ -35,6 +29,11 @@ if (typeof ipc === 'undefined') {
       }
     }
   };
+
+  globalThis.print = globalThis.Kiesel ? Kiesel.print : print;
+  globalThis.sleep = globalThis.Kiesel ? Kiesel.sleep : ms => sleep(ms / 1000);
+  globalThis.readline = globalThis.Kiesel ? Kiesel.readLine : readline;
+  globalThis.readfile = globalThis.Kiesel ? Kiesel.readFile : os.file.readFile;
 }
 
 class Element {
@@ -84,9 +83,9 @@ class Element {
   }
 }
 
-const makeEl = ({ ptr }) => {
-  if (!ptr) return null;
-  return new Element({ ptr });
+const makeEl = data => {
+  if (!data.ptr) return null;
+  return new Element(data);
 };
 
 globalThis.document = {
@@ -349,7 +348,7 @@ if (globalThis.setTimeout) {
     ipc.send({ type: 'done', ret });
   }, 100);
 } else {
-  let timerLoop = makeWindowTimer(globalThis, ms => sleep(ms / 1000));
+  let timerLoop = makeWindowTimer(globalThis, sleep);
 
   ipc.send({ type: 'ready' });
 
