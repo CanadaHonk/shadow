@@ -1,6 +1,6 @@
 import { Page } from './network.js';
 import { HTMLParser } from './htmlparser.js';
-import { constructLayout } from './layout.js';
+import { LayoutNode, constructLayout } from './layout.js';
 import { Renderer } from './renderer.js';
 import * as JS from './js/index.js';
 import * as AboutPages from './about/index.js';
@@ -34,6 +34,12 @@ window.reload = () => load(...lastLoad);
 let renderer, initialLoad = true, lastLoad;
 const _load = async (url, baseUrl = null, push = true) => {
   if (!renderer) renderer = new Renderer();
+
+  // wipe current page
+  const mock = new LayoutNode({}, renderer);
+  mock.document = { cssRules: [] };
+
+  renderer.layout = mock;
 
   console.log(url);
 
