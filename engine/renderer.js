@@ -340,12 +340,13 @@ document.onkeyup = e => {
   if (k === 'h') window.welcome();
   if (k === 'j') {
     const current = window._js.backendName;
-    const backends = [ null, 'spidermonkey', 'kiesel' ];
+    const backends = [ null, 'host', 'spidermonkey', 'kiesel' ];
     window._js.setBackend(backends[(backends.indexOf(current) + 1) % 3]);
 
     // reload page
     window.reload();
   }
+  if (k === 'r') window.reload();
 };
 
 document.onwheel = e => {

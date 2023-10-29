@@ -40,11 +40,12 @@ export default () => `<title>Shadow</title>
 <p>here are some debug keybinds for you:</p>
 <ul>
 <li><b>z</b>: hold for inspect mode (hover over stuff)</li>
+<li><b>v</b>: prompt to load url</li>
+<li><b>r</b>: reload the current page</li>
+<li><b>h</b>: go back to welcome page (here)</li>
 <li><b>x</b>: switch color scheme (light/dark)</li>
 <li><b>c</b>: dump parsed html</li>
-<li><b>v</b>: prompt to load url</li>
-<li><b>h</b>: go back to welcome page (here)</li>
-<li><b>j</b>: cycle JS engine (none -> SpiderMonkey -> Kiesel)</li>
+<li><b>j</b>: cycle JS engine (host -> none -> SpiderMonkey -> Kiesel) (reloads the page)</li>
 </ul>
 <h2>demo sites</h2>
 <ul>${demos.map(x => `<li><a href="${x[0]}">${x[0]}</a> (${x[1]})</li>`).join('\n')}</ul>
