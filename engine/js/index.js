@@ -11,7 +11,7 @@ export const setBackend = async (name, preload = true) => {
 
   backendName = name.toLowerCase();
 
-  if (preload) await run(null, '');
+  // Fif (preload) await run(null, '');
 };
 
 export const stop = doc => Runner.stop(doc);
