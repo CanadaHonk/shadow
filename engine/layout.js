@@ -1009,8 +1009,6 @@ export const constructLayout = async (document, renderer) => {
   const doc = assembleLayoutNodes(document);
   doc.root = doc.children[0];
 
-  renderer.layout = doc;
-
   const reSetDoc = x => {
     x.document = doc;
     x.root = doc.root; // <html>/:root
@@ -1021,6 +1019,8 @@ export const constructLayout = async (document, renderer) => {
   removeDeadTextNodes(doc);
 
   await doc.process();
+
+  renderer.layout = doc;
 
   const body = doc.querySelector('body');
   if (body && body.attrs.onload) setTimeout(() => {
