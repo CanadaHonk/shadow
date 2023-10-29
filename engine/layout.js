@@ -825,6 +825,35 @@ export class LayoutNode extends Node {
 
     this.invalidateCaches();
   }
+
+  // todo: this section should all be document only!
+  writing = false;
+  open() {
+    this.writing = true;
+    this.innerHTML = ''; // layout!
+
+    return this;
+  }
+
+  write(str) {
+    if (!this.writing) this.open();
+
+    this._innerHTMLHTMLTag = true; // sorry.
+
+    // big hack energy
+    this.innerHTML = str; // layout!
+  }
+
+  close() {
+    this.writing = false;
+  }
+
+  remove() {
+    super.remove();
+
+    // cleanup
+    if (this.contentDocument) window._js.stop(this.contentDocument);
+
     this.invalidateCaches();
   }
 
