@@ -340,7 +340,7 @@ document.onkeyup = e => {
   if (k === 'h') window.welcome();
   if (k === 'j') {
     const current = window._js.backendName;
-    const backends = [ null, 'host', 'spidermonkey', 'kiesel' ];
+    const backends = [ 'host', null, 'spidermonkey', 'kiesel' ];
     window._js.setBackend(backends[(backends.indexOf(current) + 1) % backends.length]);
 
     // reload page
