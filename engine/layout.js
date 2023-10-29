@@ -686,6 +686,9 @@ export class LayoutNode extends Node {
   }
 
   get innerHTML() {
+    // perf todo:
+    //  - cache this, invalidate on self/child change
+
     // https://html.spec.whatwg.org/#escapingString
     const escapeString = (str, attribute = false) => {
       // Replace any occurrence of the "&" character by the string "&amp;".
@@ -778,6 +781,9 @@ export class LayoutNode extends Node {
   }
 
   set innerHTML(value) {
+    // perf todo:
+    //  - just take value for bulk calls and do not parse/etc each time
+
     const parser = new HTMLParser();
     const dom = parser.parse(value, false);
 
@@ -800,6 +806,8 @@ export class LayoutNode extends Node {
     for (const x of layout.children) {
       this.appendChild(x);
     }
+
+    this.invalidateCaches();
   }
 
   invalidateCaches(sub = false) {
