@@ -1,6 +1,13 @@
 const funcs = {
+  // todo: error/not found handling
   'document.querySelector': ({ selector }, send, doc) => {
     const el = doc.querySelector(selector);
+    send({ ptr: el.ptr });
+  },
+
+  'document.getElementById': ({ id }, send, doc) => {
+    console.log({ id });
+    const el = doc.allChildren().find(x => x.id === id);
     send({ ptr: el.ptr });
   },
 
@@ -13,6 +20,17 @@ const funcs = {
     const el = doc.getFromPtr(ptr);
     el.textContent = value;
     send({ value: el.textContent });
+  },
+
+  'Element.getInnerHTML': ({ ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    send({ value: el.innerHTML });
+  },
+
+  'Element.setInnerHTML': ({ value, ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    el.innerHTML = value;
+    send({ value: el.innerHTML });
   },
 
   'alert': ({ msg }, send) => {
@@ -31,7 +49,7 @@ let backend = null, lastDocument = 0;
 const SERIAL_RES_SIZE = 1024 * 1024 * 10;
 
 export const run = (backendName, doc, _js) => new Promise(async resolve => {
-  if (backendName === null) return resolve(null);
+  if (backendName === null || !_js) return resolve(null);
 
   if (window.crossOriginIsolated === false) {
     alert(`due to browser restrictions, shadow has to use a service worker and reload once to be able to use some JS features which it requires for running JS (SharedArrayBuffer). try reloading`);
@@ -59,14 +77,13 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
     const valueBuffer = new SharedArrayBuffer(SERIAL_RES_SIZE);
     const valueTyped = new Uint8Array(valueBuffer);
 
-    const encodeBuffer = new Uint8Array(SERIAL_RES_SIZE);
-
     const encoder = new TextEncoder('utf8');
 
     backend.worker.postMessage({ lengthBuffer, valueBuffer });
 
     backend.worker.onmessage = e => {
       // console.log('main recv', e.data);
+
       const msg = e.data;
       if (backend.handlers[msg.type]) {
         backend.handlers[msg.type](msg);
@@ -78,14 +95,18 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
     backend.send = msg => {
       // console.log('main send', msg);
 
-      const json = JSON.stringify(msg);
-      encoder.encodeInto(json, encodeBuffer);
+      // const encodeBuffer = new Uint8Array(SERIAL_RES_SIZE);
 
-      for (let i = 0; i < json.length; i++) {
+      const json = JSON.stringify(msg);
+      // encoder.encodeInto(json, encodeBuffer);
+
+      const encodeBuffer = encoder.encode(json);
+
+      for (let i = 0; i < encodeBuffer.length; i++) {
         Atomics.store(valueTyped, i, encodeBuffer[i]);
       }
 
-      Atomics.store(lengthTyped, 0, json.length);
+      Atomics.store(lengthTyped, 0, encodeBuffer.length);
       Atomics.notify(lengthTyped, 0);
     };
 
@@ -97,7 +118,8 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
     }));
   }
 
-  const js = _js.slice();
+  const js = _js.slice().trim();
+  console.log({ js });
 
   backend.on('wait', () => {
     backend.send({ type: 'eval', js });
