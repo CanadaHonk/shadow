@@ -8,6 +8,7 @@ export default ({ url }) => {
   if (error.includes('Layout')) title = 'Layout error';
 
   return `<title>Shadow error</title>
+<meta name="color-scheme" content="dark light">
 <body>
 <h1>${title}</h1>
 

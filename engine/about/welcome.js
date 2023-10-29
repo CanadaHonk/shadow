@@ -33,6 +33,7 @@ const supported = [
 ];
 
 export default () => `<title>Shadow</title>
+<meta name="color-scheme" content="dark light">
 <body>
 <h1>welcome to Shadow <small>v${version}</small></h1>
 <p>Shadow is a ${days} day old novel web engine made (almost) entirely in JS from scratch, only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>

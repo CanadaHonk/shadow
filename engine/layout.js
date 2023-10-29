@@ -35,9 +35,11 @@ const defaultProperties = {
   'border-bottom-width': '0px',
   'border-left-width': '0px',
   'border-right-width': '0px',
+
+  'color-scheme': 'normal'
 };
 
-const inheritedProperties = [ "azimuth", "border-collapse", "border-spacing", "caption-side", "color", "cursor", "direction", "elevation", "empty-cells", "font-family", "font-style", "font-variant", "font-weight", "font", "letter-spacing", "line-height", "list-style-image", "list-style-position", "list-style-type", "list-style", "orphans", "pitch-range", "pitch", "quotes", "richness", "speak-header", "speak-numeral", "speak-punctuation", "speak", "speech-rate", "stress", "text-align", "text-indent", "text-transform", "visibility", "voice-family", "volume", "white-space", "widows", "word-spacing" ];
+const inheritedProperties = [ "azimuth", "border-collapse", "border-spacing", "caption-side", "color", "cursor", "direction", "elevation", "empty-cells", "font-family", "font-style", "font-variant", "font-weight", "font", "letter-spacing", "line-height", "list-style-image", "list-style-position", "list-style-type", "list-style", "orphans", "pitch-range", "pitch", "quotes", "richness", "speak-header", "speak-numeral", "speak-punctuation", "speak", "speech-rate", "stress", "text-align", "text-indent", "text-transform", "visibility", "voice-family", "volume", "white-space", "widows", "word-spacing", "color-scheme" ];
 
 // eg: font-size -> fontSize
 const propToFunc = x => x.replace(/\-[a-z]/g, _ => _[1].toUpperCase());
@@ -163,6 +165,24 @@ export class LayoutNode extends Node {
     return find(this);
   }
 
+  querySelectorAll(text) {
+    const selector = CSSRule.parseSelector(text);
+
+    const out = [];
+    const find = x => {
+      if (x.matchesCSS(selector)) out.push(x);
+
+      for (const y of x.children) {
+        const o = find(y);
+        if (o) return o;
+      }
+    };
+
+    find(this);
+
+    return out;
+  }
+
   // parse a [ b [ c [ d ] ] ] shorthand (eg margin, padding) into [top, bottom, left, right]
   parse4Shorthand(x) {
     x = this.resolveValue(x);
@@ -232,6 +252,12 @@ export class LayoutNode extends Node {
       props['padding-bottom'] = paddingBottom;
       props['padding-left'] = paddingLeft;
       props['padding-right'] = paddingRight;
+    }
+
+    if (this.tagName === 'document') {
+      // todo: use this.querySelector('meta[name="color-scheme"]') once supported
+      const colorSchemeMeta = this.querySelectorAll('meta').find(x => x.attrs.name === 'color-scheme');
+      if (colorSchemeMeta) props['color-scheme'] = colorSchemeMeta.attrs.content;
     }
 
     return this._cssCache = props;
@@ -570,8 +596,26 @@ export class LayoutNode extends Node {
     return `${this.css()['font-style']} ${this.css()['font-weight']} ${this.fontSize()}px ${this.css()['font-family']}`;
   }
 
+  colorScheme() {
+    const val = this.css()['color-scheme'];
+    if (val === 'light' || val === 'dark') return val;
+
+    // most pages expect light so shrug?
+    if (val === 'normal') return 'light';
+
+    const pageSupports = val.split(' ');
+    const pagePrefers = pageSupports[0];
+    const userPrefers = window.colorScheme;
+
+    if (pageSupports.includes(userPrefers)) return userPrefers;
+
+    return pagePrefers;
+  }
+
   colorAbs(i) {
     const x = this.resolveValue(i);
+    const colorScheme = this.colorScheme();
+
     switch (x) {
       case 'Canvas': return colorScheme === 'dark' ? '#121212' : '#ffffff';
       case 'CanvasText': return colorScheme === 'dark' ? '#ffffff' : '#000000';
@@ -919,6 +963,7 @@ export class LayoutNode extends Node {
 
       const proc = x => {
         x.document = doc;
+        x.root = doc.children[0];
         for (const y of x.children) proc(y);
       };
 
@@ -962,11 +1007,13 @@ export const constructLayout = async (document, renderer) => {
   };
 
   const doc = assembleLayoutNodes(document);
+  doc.root = doc.children[0];
 
   renderer.layout = doc;
 
   const reSetDoc = x => {
     x.document = doc;
+    x.root = doc.root; // <html>/:root
     for (const y of x.children) reSetDoc(y);
   };
   reSetDoc(doc);

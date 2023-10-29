@@ -38,10 +38,11 @@ const _load = async (url, baseUrl = null, push = true) => {
   // wipe current page
   _js.stopAll();
 
-  const mock = new LayoutNode({}, renderer);
+  /* const mock = new LayoutNode({}, renderer);
   mock.document = { cssRules: [] };
+  mock.root = mock;
 
-  renderer.layout = mock;
+  renderer.layout = mock; */
 
   console.log(url);
 

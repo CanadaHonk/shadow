@@ -93,7 +93,7 @@ export class Renderer {
     const frameTimeStart = performance.now();
     const deltaTime = frameTimeStart - lastFrame;
 
-    this.ctx.fillStyle = this.layout.colorAbs('Canvas');
+    this.ctx.fillStyle = this.layout.root.colorAbs('Canvas');
     this.ctx.fillRect(0, scrollY, cWidth, scrollY + cHeight);
 
     hoverLink = null;
@@ -326,7 +326,11 @@ document.onkeydown = e => {
 document.onkeyup = e => {
   const k = e.key.toLowerCase();
   if (k === 'z') debug = false;
-  if (k === 'x') window.colorScheme = window.colorScheme === 'light' ? 'dark' : 'light';
+  if (k === 'x') {
+    window.colorScheme = window.colorScheme === 'light' ? 'dark' : 'light';
+    window._renderer.layout.invalidateCaches();
+  }
+
   if (k === 'c') {
     const a = document.createElement('pre');
     a.textContent = window._doc.toString();
