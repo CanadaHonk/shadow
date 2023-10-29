@@ -1,4 +1,4 @@
-import { Node } from './dom.js';
+import { Document, Node } from './dom.js';
 import { CSSParser, CSSRule, SelectorType, CombinatorType } from './cssparser.js';
 import { HTMLParser } from './htmlparser.js';
 
@@ -857,6 +857,12 @@ export class LayoutNode extends Node {
     this.invalidateCaches();
   }
 
+  /* appendChild(node) {
+    super.appendChild(node);
+
+    this.invalidateCaches();
+  } */
+
   invalidateCaches(sub = false) {
     super.invalidateCaches();
 
@@ -897,6 +903,30 @@ export class LayoutNode extends Node {
 
       const content = this.children[0]?.content;
       if (content) await window._js.run(this.document, content);
+    }
+
+    if (this.tagName === 'iframe') {
+      const doc = new LayoutNode(new Document(), this.renderer);
+      doc.document = doc;
+      doc.parentDocument = this.document;
+      // doc.frame = this;
+      doc.parent = this;
+
+      doc.page = this.document.page; // hack: we should make our own page!
+
+      this.contentDocument = doc;
+
+      const proc = x => {
+        x.document = doc;
+        for (const y of x.children) proc(y);
+      };
+
+      for (const y of this.children) {
+        y.parent = doc;
+        proc(y);
+      }
+
+      this.children = [];
     }
 
     for (const x of this.children) await x.process();
