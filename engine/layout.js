@@ -851,11 +851,11 @@ export class LayoutNode extends Node {
 export const constructLayout = async (document, renderer) => {
   const assembleLayoutNodes = x => {
     const a = new LayoutNode(x, renderer);
-    a.children = a.children.map(y => assembleLayoutNodes(y));
-
-    for (const y of a.children) {
-      y.parent = a;
-    }
+    a.children = a.children.map(y => {
+      const z = assembleLayoutNodes(y);
+      z.parent = a;
+      return z;
+    });
 
     return a;
   };
