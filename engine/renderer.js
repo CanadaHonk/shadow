@@ -136,7 +136,14 @@ export class Renderer {
               this.ctx.fillStyle = `rgba(100, 100, 250, 0.5)`;
               this.ctx.fillRect(x + _.paddingLeft(), y + _.paddingTop(), width - _.paddingLeft() - _.paddingRight(), height - _.paddingTop() - _.paddingBottom());
 
-              this.infoBox(`${_.tagName} (x=${x},y=${y},w=${width},h=${height},tw=${_.totalWidth()},th=${_.totalHeight()})`, x - _.marginLeft(), y - _.marginTop());
+              let infoY = y - _.marginTop(), infoAlignBottom = true;
+
+              if (infoY < 20) {
+                infoY = y + _.height() + _.marginBottom();
+                infoAlignBottom = false;
+              }
+
+              this.infoBox(`${_.tagName} (x=${x},y=${y},w=${width},h=${height},tw=${_.totalWidth()},th=${_.totalHeight()})`, x - _.marginLeft(), infoY, infoAlignBottom);
             });
 
             hoverEl = _;
@@ -218,7 +225,7 @@ export class Renderer {
     requestAnimationFrame(this.update);
   }
 
-  infoBox(text, x = 0, y = 0) {
+  infoBox(text, x = 0, y = 0, alignBottom = true) {
     this.ctx.font = 'normal 12px sans-serif';
     this.ctx.textBaseline = 'bottom';
 
@@ -226,7 +233,11 @@ export class Renderer {
 
     const measure = this.ctx.measureText(text);
     const boxHeight = measure.height ?? (Math.abs(measure.fontBoundingBoxAscent) + Math.abs(measure.fontBoundingBoxDescent) + boxPadding * 2);
-    const boxY = y - boxHeight;
+    let boxY = y - (alignBottom ? boxHeight : 0);
+
+    if (boxY > cHeight) {
+      boxY = cHeight - boxHeight;
+    }
 
     this.ctx.fillStyle = '#202124';
     this.ctx.fillRect(x, boxY, measure.width + boxPadding * 4, boxHeight);
