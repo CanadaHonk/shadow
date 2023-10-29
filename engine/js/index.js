@@ -6,7 +6,6 @@ export const setBackend = async (name, preload = true) => {
   console.log('js backend is now', name);
   if (name === null) {
     backendName = null;
-    backend = null;
     return;
   }
 
