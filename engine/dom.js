@@ -45,6 +45,11 @@ export class Node {
     return this.attrs.class ?? '';
   }
 
+  set className(value) {
+    this.attrs.class = value ?? '';
+    this.invalidateCaches();
+  }
+
   _classesCache;
   get classes() {
     if (this._classesCache) return this._classesCache;
