@@ -963,6 +963,8 @@ export const constructLayout = async (document, renderer) => {
 
   const doc = assembleLayoutNodes(document);
 
+  renderer.layout = doc;
+
   const reSetDoc = x => {
     x.document = doc;
     for (const y of x.children) reSetDoc(y);

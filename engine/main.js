@@ -88,7 +88,6 @@ const _load = async (url, baseUrl = null, push = true) => {
   favicon_setter.href = page.resolve('/favicon.ico');
 
   initialLoad = false;
-  renderer.layout = layout;
 };
 
 const load = (...args) => {
