@@ -54,6 +54,7 @@ export default async (url, args) => {
   wasmFs.volume.fds[1].position = 0;
   wasmFs.volume.fds[2].position = 0;
 
+  wasmFs.fs.writeFileSync('/comm', "");
   wasmFs.fs.writeFileSync('/dev/stdin', "");
   wasmFs.fs.writeFileSync('/dev/stdout', "");
   wasmFs.fs.writeFileSync('/dev/stderr', "");
@@ -86,15 +87,23 @@ export default async (url, args) => {
 
           Atomics.wait(lengthTyped, 0, 0, Infinity) // wait until typed[0] != 0
 
-          const length = lengthTyped[0];
+          const length = Atomics.load(lengthTyped, 0);
 
           for (let i = 0; i < length; i++) {
             decodeBuffer[i] = Atomics.load(valueTyped, i);
           }
 
           const reply = decoder.decode(decodeBuffer.slice(0, length));
-          // console.log('worker postmessage reply', JSON.parse(reply));
-          wasmFs.fs.appendFileSync('/dev/stdin', reply + '\n');
+          // console.log('worker postmessage reply', reply);
+
+
+          if (reply.startsWith('{"type":"eval')) {
+            wasmFs.fs.writeFileSync('/comm', 'JS|' + JSON.parse(reply).js + '\n');
+          } else {
+            wasmFs.fs.writeFileSync('/comm', reply + '\n');
+          }
+
+          wasmFs.fs.appendFileSync('/dev/stdin', 'A\n');
         }
       }
     }
