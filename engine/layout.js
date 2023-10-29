@@ -484,7 +484,7 @@ export class LayoutNode extends Node {
 
     if (this.isBlock()) {
       // take up as much as we can?
-      return this.parent.contentWidth() - this.horizontalSpace(true);
+      return (this.parent ?? this.frame).contentWidth() - this.horizontalSpace(true);
     }
 
     let width = 0;
@@ -560,15 +560,16 @@ export class LayoutNode extends Node {
   }
 
   x() {
-    if (!this.parent) return 0;
+    const parent = this.parent ?? this.frame;
+    if (!parent) return 0;
 
     let x = this.marginLeft();
     if (this.siblingBefore && this.siblingBefore.isInline() && this.isInline()) {
       x += this.siblingBefore.x();
       x += this.siblingBefore.width() + this.siblingBefore.marginRight();
     } else {
-      x += this.parent.x();
-      x += this.parent.paddingLeft();
+      x += parent.x();
+      x += parent.paddingLeft();
     }
 
     // if (this.siblingBefore?.tagName === 'a' && this.siblingBefore.children[0]?.content?.includes?.('hyper')) console.log(x, this.isInline());
@@ -586,30 +587,16 @@ export class LayoutNode extends Node {
   }
 
   y() {
-    if (!this.parent) return 0;
-
-    /*
-    let y = this.parent.y();
-
-    y += this.parent.marginTop();
-
-    for (const x of this.previousSiblings) {
-      if (x.isBlock()) {
-        y += x.height();
-
-        if (x.marginTop() >= x.siblingBefore?.marginBottom?.()) y -= x.siblingBefore.marginBottom();
-      }
-    } */
-
-    // if (this.tagName === 'img' && this.attrs.src === 'banner2.png') console.log(this.parent.marginTop());
+    const parent = this.parent ?? this.frame;
+    if (!parent) return 0;
 
     let y = this.marginTop();
     if (this.siblingBefore) {
       y += this.siblingBefore.y();
       if (this.isBlock() || this.siblingBefore.isBlock()) y += this.siblingBefore.height() + this.siblingBefore.marginBottom();
     } else {
-      y += this.parent.y();
-      y += this.parent.paddingTop();
+      y += parent.y();
+      y += parent.paddingTop();
     }
 
     y = this.collapseVerticalMargin(y);
@@ -982,8 +969,7 @@ export class LayoutNode extends Node {
       const doc = new LayoutNode(new Document(), this.renderer);
       doc.document = doc;
       doc.parentDocument = this.document;
-      // doc.frame = this;
-      doc.parent = this;
+      doc.frame = this;
 
       doc.page = this.document.page; // hack: we should make our own page!
 
