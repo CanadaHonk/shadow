@@ -197,8 +197,8 @@ export class Renderer {
     };
     draw(this.layout);
 
-    for (const x of doLast) x();
     if (inspects.length > 0) inspects.pop()();
+    for (const x of doLast) x();
 
     fpsFrameCount++;
     if (performance.now() > fpsLastUpdate + 1000 / fpsAcc) {
@@ -229,10 +229,12 @@ export class Renderer {
     this.ctx.font = 'normal 12px sans-serif';
     this.ctx.textBaseline = 'bottom';
 
-    const boxPadding = 2;
+    const boxPadding = 3;
+    const boxPaddingX = Math.ceil(boxPadding * 1.25);
+    const boxPaddingY = boxPadding;
 
     const measure = this.ctx.measureText(text);
-    const boxHeight = measure.height ?? (Math.abs(measure.fontBoundingBoxAscent) + Math.abs(measure.fontBoundingBoxDescent) + boxPadding * 2);
+    const boxHeight = measure.height ?? (Math.abs(measure.fontBoundingBoxAscent) + Math.abs(measure.fontBoundingBoxDescent) + boxPaddingY * 2);
     let boxY = y - (alignBottom ? boxHeight : 0);
 
     if (boxY > cHeight) {
@@ -240,11 +242,11 @@ export class Renderer {
     }
 
     this.ctx.fillStyle = '#202124';
-    this.ctx.fillRect(x, boxY, measure.width + boxPadding * 4, boxHeight);
+    this.ctx.fillRect(x, boxY, measure.width + boxPaddingX * 2, boxHeight);
 
     this.ctx.fillStyle = 'white';
 
-    this.ctx.fillText(text, x + boxPadding * 2, boxY + boxPadding + boxHeight - boxPadding * 2);
+    this.ctx.fillText(text, x + boxPaddingX, boxY + boxHeight - boxPaddingY);
   }
 
   wrapText(font, text, width) {
