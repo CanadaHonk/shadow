@@ -72,9 +72,12 @@ export class LayoutNode extends Node {
     };
 
     cache('x'); cache('y'); cache('width'); cache('height');
-    // cache('display'); cache('isBlock'); cache('isInline');
-    // cache('contentWidth'); cache('contentHeight');
-    // cache('totalWidth'); cache('totalHeight');
+    cache('display'); cache('isBlock'); cache('isInline');
+    cache('color'); cache('backgroundColor');
+    cache('contentWidth'); cache('contentHeight');
+    cache('totalWidth'); cache('totalHeight');
+    cache('displayContent');
+    cache('colorScheme');
 
     if (this.tagName === 'img') this.loadImage();
   }
