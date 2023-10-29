@@ -85,7 +85,6 @@ export class Node {
 
   remove() {
     this.parent.children.splice(this.parent.children.indexOf(this), 1);
-    delete this;
   }
 
   getAttr(name) {
