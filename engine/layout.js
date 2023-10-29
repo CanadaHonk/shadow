@@ -784,10 +784,22 @@ export class LayoutNode extends Node {
     // perf todo:
     //  - just take value for bulk calls and do not parse/etc each time
 
-    const parser = new HTMLParser();
-    const dom = parser.parse(value, false);
+    // megahack: only remove if we have a child needing clean up
+    if (this.children[0]?.tagName === 'iframe') {
+      // is proper but really slow
+      for (const x of this.children) x.remove();
+    } else {
+      this.children = [];
+    }
 
-    this.children = [];
+    if (!value) { // set to empty, just stop here
+      this.invalidateCaches();
+      return;
+    }
+
+    const parser = new HTMLParser();
+    const dom = parser.parse(value, this._innerHTMLHTMLTag);
+    this._innerHTMLHTMLTag = false;
 
     const process = x => {
       x = new LayoutNode(x, this.renderer);
@@ -803,10 +815,16 @@ export class LayoutNode extends Node {
     };
     const layout = process(dom);
 
+    removeDeadTextNodes(layout);
+
     for (const x of layout.children) {
       this.appendChild(x);
     }
 
+    this.process();
+
+    this.invalidateCaches();
+  }
     this.invalidateCaches();
   }
 
