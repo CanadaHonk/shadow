@@ -6,6 +6,7 @@ const demos = [
   [ 'https://info.cern.ch/hypertext/WWW/TheProject.html', 'basically spot on' ],
   [ 'https://www.stroustrup.com', 'usable?' ],
   [ 'https://cs.sjoy.lol', 'usable?' ],
+  [ 'https://mozilla.github.io/krakenbenchmark.mozilla.org/', 'older JS benchmark, takes ~1 min for host JS, very long for others' ]
 ];
 
 const supported = [
@@ -30,22 +31,25 @@ const supported = [
   'cursor',
   'margin collapsing',
   'copying page title and favicon to real browser tab',
-  '(partial) navigation via real browser history api'
+  '(partial) navigation via real browser history api',
+  'css color-scheme',
+  '<iframe> (partial)',
+  'css margin: auto'
 ];
 
 export default () => `<title>Shadow</title>
 <meta name="color-scheme" content="dark light">
 <body>
 <h1>welcome to Shadow <small>v${version}</small></h1>
-<p>Shadow is a ${days} day old novel web engine made (almost) entirely in JS from scratch, only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>
-<p>here's a twist: <u>you're using it right now</u>! you can use the fps counter in the top right as an indicator. also, expect nothing to work :)</p>
+<p>Shadow is a ${weeks} week old novel browser engine made (almost) entirely in JS from scratch,<br>only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>
+<p>here's a twist: <u>you're using it right now</u>! you can use the fps counter in the top right as an indicator.</p>
 <p>here are some debug keybinds for you:</p>
 <ul>
 <li><b>Z</b>: hold for inspect mode (hover over stuff)</li>
 <li><b>V</b>: prompt to load url</li>
 <li><b>R</b>: reload the current page</li>
 <li><b>H</b>: go back to welcome page (here)</li>
-<li><b>X</b>: switch color scheme (light/dark)</li>
+<li><b>X</b>: switch preferred color scheme (light/dark)</li>
 <li><b>C</b>: dump parsed html</li>
 <li><b>J</b>: cycle JS engine (host -> none -> SpiderMonkey -> Kiesel) (reloads the page)</li>
 </ul>
@@ -80,6 +84,9 @@ export default () => `<title>Shadow</title>
 <li><a href="engine/ua.css" target="_parent">UA stylesheet</a></li>
 <li><a href="https://github.com/CanadaHonk/shadow" target="_parent">source code</a></li>
 </ul>
+
+<h2>components of Shadow</h2>
+<img width=800 src="https://mermaid.ink/svg/pako:eNpVkT1vhDAMhv8KygxVaTuB1Kljp96axSLukQtJUByK0N399zogFJAyOI_f1x_yXXReoWjENcDYF98_rXRF0YH7A6peqs_eU0zEYZx9MNpdj5R6UH6uGEQ7jBAIwwlnV8LKW2YdUVZmH2c4vzbfBYwGWPwUszn_t4hRQKcwbOX2-KQ8wG2vBGcgmzahUXPSemdwOXKjkXDIjR9-jJV2j9vqvlEed42TTbp1Lu3MJS4DFq9lXdb83gqKwRtsAqr2LKnfy_pjT_MFllaUwvI8oBXf5J7UUsQeLUrRcKggGCmke7IOpugvi-tEE8OEpZhGBRG_NHAhK5pfGAif_zYlpas" alt="Component flowchart">
 
 <h2>implemented</h2>
 <ul>${supported.map(x => `<li>${x.replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</li>`).join('\n')}</ul>
