@@ -886,6 +886,11 @@ export const constructLayout = async (document, renderer) => {
 
   await doc.process();
 
+  const body = doc.querySelector('body');
+  if (body && body.attrs.onload) setTimeout(() => {
+    window._js.run(doc, body.attrs.onload);
+  }, 10);
+
   return doc;
 };
 
