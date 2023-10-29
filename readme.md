@@ -1,6 +1,6 @@
 # shadow
 
-***&lt;shadow&gt;*** is a new novel web engine made entirely in JS (mostly) from scratch.
+Shadow is a new novel web engine made entirely in JS (mostly) from scratch.
 
 ## [open it!](https://shadow.goose.icu)
 (more info there)
@@ -13,7 +13,6 @@
 - :hover
 - li markers (list-style-type)
 - margin-inline, margin-block (hack: -> margin?)
-- margin auto
 - text-align
 - line-height
 - rem unit
@@ -31,3 +30,4 @@
 - http://home.mcom.com/home/welcome.html (blank?)
 - https://cs.sjoy.lol (text good! styling bad)
 - https://www.stroustrup.com (okay content, not styling)
+- https://kevinlocke.name/

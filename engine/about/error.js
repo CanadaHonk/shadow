@@ -7,7 +7,7 @@ export default ({ url }) => {
   if (error.includes('Render')) title = 'Render error';
   if (error.includes('Layout')) title = 'Layout error';
 
-  return `<title>&lt;shadow&gt; error</title>
+  return `<title>Shadow error</title>
 <body>
 <h1>${title}</h1>
 

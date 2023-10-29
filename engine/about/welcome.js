@@ -1,5 +1,3 @@
-const shadow = `<i><b>&lt;shadow&gt;</b></i>`;
-
 const days = new Date(new Date() - new Date('2023-10-23')).getDate();
 
 const demos = [
@@ -34,10 +32,10 @@ const supported = [
   '(partial) navigation via real browser history api'
 ];
 
-export default () => `<title>&lt;shadow&gt;</title>
+export default () => `<title>Shadow</title>
 <body>
-<h1>welcome to ${shadow} <small>v${version}</small></h1>
-<p><i><b>&lt;shadow&gt;</b></i> is a ${days} day old novel web engine made (almost) entirely in JS from scratch, only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>
+<h1>welcome to Shadow <small>v${version}</small></h1>
+<p>Shadow is a ${days} day old novel web engine made (almost) entirely in JS from scratch, only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>
 <p>here's a twist: <u>you're using it right now</u>! you can use the fps counter in the top right as an indicator. also, expect nothing to work :)</p>
 <p>here are some debug keybinds for you:</p>
 <ul>
@@ -60,7 +58,7 @@ export default () => `<title>&lt;shadow&gt;</title>
 </ul>
 
 <h2>javascript <span class="new">new!</span></h2>
-<p>${shadow} has extremely experimental javascript support. this is not intended to be usable, rather a proof of concept. off by default.</p>
+<p>Shadow has extremely experimental javascript support. this is not intended to be usable, rather a proof of concept. off by default.</p>
 <p>bonus: <b>you can choose which JS engine to use!</b></p>
 
 <ul>
