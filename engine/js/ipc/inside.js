@@ -344,7 +344,13 @@ if (globalThis.setTimeout) {
 
     if (evalQueue.length === 0) return;
 
-    const ret = (0, eval)(evalQueue.pop().js);
+    let ret;
+    try {
+      ret = (0, eval)(evalQueue.pop().js);
+    } catch (e) {
+      ret = e;
+    }
+
     ipc.send({ type: 'done', ret });
   }, 100);
 } else {
@@ -363,7 +369,14 @@ if (globalThis.setTimeout) {
 
     // console.log('evaling');
 
-    const ret = eval(evalQueue.pop().js);
+    let ret;
+    try {
+      // ret = (0, eval)(evalQueue.pop().js);
+      ret = eval(evalQueue.pop().js);
+    } catch (e) {
+      ret = e;
+    }
+
     ipc.send({ type: 'done', ret });
   }
 }
