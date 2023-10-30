@@ -66,7 +66,19 @@ const _load = async (url, baseUrl = null, push = true) => {
   const page = new Page(realURL);
   if (baseUrl) page.baseURL = baseUrl;
 
-  let html = await (await page.fetch(realURL)).text();
+  const res = await page.fetch(realURL);
+
+  let html;
+  switch (res.headers.get('Content-Type').split(';')[0]) {
+    case 'text/javascript':
+    case 'text/css':
+      html = `<body><pre>${await res.text()}</pre></body>`;
+      break;
+
+    default:
+      html = await res.text();
+      break;
+  }
 
   console.log(html);
 
