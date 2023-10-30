@@ -212,7 +212,7 @@ export class HTMLParser {
 
               this.parent = this.parent.parent;
 
-              i = end + endTag.length;
+              i = end + endTag.length - 1;
             }
 
             continue;
