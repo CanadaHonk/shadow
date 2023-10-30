@@ -7,6 +7,7 @@ const uaRules = new CSSParser().parse(uaRaw);
 
 const defaultProperties = {
   display: 'inline',
+  position: 'static',
 
   width: 'auto',
   height: 'auto',
@@ -35,6 +36,11 @@ const defaultProperties = {
   'border-bottom-width': '0px',
   'border-left-width': '0px',
   'border-right-width': '0px',
+
+  top: 'auto',
+  bottom: 'auto',
+  left: 'auto',
+  right: 'auto',
 
   'color-scheme': 'normal',
   'line-height': '1.2em',
@@ -298,6 +304,14 @@ export class LayoutNode extends Node {
 
     // if (this.tagName === '#text') return 'inline';
     return this.css().display;
+  }
+
+  position() {
+    return this.css().position;
+  }
+
+  isAbsolute() {
+    return this.position() === 'absolute';
   }
 
   displayContent() {
@@ -754,6 +768,8 @@ export class LayoutNode extends Node {
   }
 
   endX() {
+    if (this.isAbsolute() || this.display() === 'none') return this.x();
+
     if (this.tagName === '#text') {
       const chunks = this.textChunks();
       const lastChunk = chunks[chunks.length - 1];
@@ -770,6 +786,8 @@ export class LayoutNode extends Node {
   }
 
   endY() {
+    if (this.isAbsolute() || this.display() === 'none') return this.y();
+
     if (this.tagName === '#text') {
       const chunks = this.textChunks();
       const lastChunk = chunks[chunks.length - 1];
@@ -792,6 +810,19 @@ export class LayoutNode extends Node {
   x() {
     const parent = this.parent ?? this.frame;
     if (!parent) return 0;
+
+    if (this.isAbsolute()) {
+      // todo: actual relative root, not just doc
+      const relativeRoot = this.document;
+
+      const left = this.css().left;
+      if (left !== 'auto') return relativeRoot.x() + this.lengthAbs(left, 'left');
+
+      const right = this.css().right;
+      if (right !== 'auto') return relativeRoot.x() + relativeRoot.width() - this.lengthAbs(right, 'right') - this.totalWidth();
+
+      return 0;
+    }
 
     let x = this.marginLeft();
     if (this.siblingBefore && this.siblingBefore.isInline() && this.isInline()) {
@@ -818,6 +849,19 @@ export class LayoutNode extends Node {
   y() {
     const parent = this.parent ?? this.frame;
     if (!parent) return 0;
+
+    if (this.isAbsolute()) {
+      // todo: actual relative root, not just doc
+      const relativeRoot = this.document;
+
+      const top = this.css().top;
+      if (top !== 'auto') return relativeRoot.y() + this.lengthAbs(top, 'top');
+
+      const bottom = this.css().bottom;
+      if (bottom !== 'auto') return relativeRoot.y() + relativeRoot.height() + this.lengthAbs(bottom, 'bottom') - this.totalHeight();
+
+      return 0;
+    }
 
     let y = this.marginTop();
     if (this.children[0]?.marginTop()) y = Math.max(y, this.children[0]?.marginTop());
