@@ -499,19 +499,19 @@ export class LayoutNode extends Node {
   }
 
   imageWidth() {
+    if (this.css().width !== 'auto') return this.lengthAbs(this.css().width, 'width');
+
     if (this.attrs.width) return this.lengthAbs(this.attrs.width, 'width-attr');
-    if (this.attrs.height) {
-      return this.imageRatio() * this.lengthAbs(this.attrs.height, 'height-attr');
-    }
+    if (this.attrs.height || this.css().height !== 'auto') return this.imageHeight() * this.imageRatio();
 
     return this._image?.width ?? 0;
   }
 
   imageHeight() {
+    if (this.css().height !== 'auto') return this.lengthAbs(this.css().height, 'height');
+
     if (this.attrs.height) return this.lengthAbs(this.attrs.height, 'height-attr');
-    if (this.attrs.width) {
-      return this.lengthAbs(this.attrs.width, 'width-attr') / this.imageRatio();
-    }
+    if (this.attrs.width || this.css().width !== 'auto') return this.imageWidth() / this.imageRatio();
 
     return this._image?.height ?? 0;
   }
@@ -638,12 +638,12 @@ export class LayoutNode extends Node {
   contentWidth() {
     if (this.tagName === 'document') return this.renderer.canvas.width;
 
+    if (this.tagName === 'img') return this.imageWidth();
+
     // manually set width
     if (this.css().width !== 'auto') {
       return this.lengthAbs(this.css().width, 'width');
     }
-
-    if (this.tagName === 'img') return this.imageWidth();
 
     if (this.isBlock()) {
       // take up as much as we can?
@@ -658,13 +658,11 @@ export class LayoutNode extends Node {
   }
 
   contentHeight() {
-    // if (this.tagName === 'div') console.log(this.css().height);
-    // manually set width
+    if (this.tagName === 'img') return this.imageHeight();
+
     if (this.css().height !== 'auto') {
       return this.lengthAbs(this.css().height, 'height');
     }
-
-    if (this.tagName === 'img') return this.imageHeight();
 
     if (true) {
       let maxY;
