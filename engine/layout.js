@@ -14,6 +14,8 @@ const defaultProperties = {
 
   cursor: 'auto',
 
+  'text-align': 'left',
+
   'font-family': '',
   'font-size': '1em',
   'font-style': 'normal',
@@ -832,6 +834,24 @@ export class LayoutNode extends Node {
       x += parent.paddingLeft();
     }
 
+    if (this.isInline() && this.css()['text-align'] !== 'left') {
+      // hack: align next time as we cannot compute our own width here
+      if (!this.cache._alignWidth) {
+        setTimeout(() => {
+          this.cache._alignWidth = this.totalWidth();
+          this.cache._alignWidthParent = this.parent.contentWidth();
+          this.invalidateCaches(false, ['_alignWidth', '_alignWidthParent']);
+        }, 0);
+
+        return this._alignTmp ?? -9999;
+      }
+
+      switch (this.css()['text-align']) {
+        case 'center': return this._alignTmp = x + ((this.cache._alignWidthParent ?? 0) - (this.cache._alignWidth ?? 0)) / 2;
+        case 'right': return this._alignTmp = x + ((this.cache._alignWidthParent ?? 0) - (this.cache._alignWidth ?? 0));
+      }
+    }
+
     // if (this.siblingBefore?.tagName === 'a' && this.siblingBefore.children[0]?.content?.includes?.('hyper')) console.log(x, this.isInline());
 
     return x;
@@ -1198,20 +1218,34 @@ export class LayoutNode extends Node {
     this.invalidateCaches();
   } */
 
-  invalidateCaches(sub = false) {
+  invalidateCaches(sub = false, exclude = []) {
     super.invalidateCaches();
 
     // just invalidate the entire document
     // todo: not do this
     if (!sub) {
-      this.document.invalidateCaches(true);
-      for (const x of this.document.allChildren()) x.invalidateCaches(true);
+      this.document.invalidateCaches(true, exclude);
+      for (const x of this.document.allChildren()) x.invalidateCaches(true, exclude);
     }
 
     // if (this.parent) this.parent.invalidateCaches();
 
     this._cssCache = null;
-    this.cache = {};
+
+    const oldCache = {};
+
+    for (const x of exclude) {
+      oldCache[x] = this.cache[x];
+    }
+
+    this.cache = oldCache;
+  }
+
+  invalidateDirectCaches() {
+    super.invalidateCaches();
+    this.invalidateCaches(true);
+
+    for (const x of this.children) x.invalidateDirectCaches();
   }
 
   async process() {
