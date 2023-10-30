@@ -6,7 +6,7 @@ let frame = 0;
 let debug = false;
 let hoverEl, hoverLink;
 
-let scrollY = 0;
+window.scrollY = 0;
 
 const renderScale = window.devicePixelRatio * 1;
 
@@ -103,7 +103,7 @@ export class Renderer {
 
     let cursor, hoverText = false;
 
-    const doLast = [], inspects = [];
+    const inspects = [];
 
     const draw = (_, depth = 0) => {
       if (_.display() === 'none') return;
@@ -147,18 +147,12 @@ export class Renderer {
               this.infoBox(`${_.tagName} (x=${x},y=${y},w=${width},h=${height},tw=${_.totalWidth()},th=${_.totalHeight()})`, x - _.marginLeft(), infoY, infoAlignBottom);
             });
 
-            hoverEl = _;
+            if (_.isBlock()) {
+              hoverEl = _;
 
-            const newCursor = _.css().cursor;
-            if (newCursor !== 'auto') cursor = newCursor;
-          } else hoverText = true;
-
-          // tooltip info in bottom left
-          if (_.tagName === 'a') {
-            hoverLink = _;
-            doLast.push(() => {
-              this.infoBox(_.href, 0, scrollY + cHeight);
-            });
+              const newCursor = _.parent.css().cursor;
+              if (newCursor !== 'auto') cursor = newCursor;
+            }
           }
         }
       }
@@ -173,22 +167,58 @@ export class Renderer {
         this.ctx.textBaseline = 'bottom';
         this.ctx.fillStyle = _.color();
 
-        switch (_.parent.css()['text-decoration']) {
-          case 'underline':
-            this.ctx.fillRect(x, y + height - 3, width, 1);
-            break;
-        }
+        for (const c of _.textChunks()) {
+          const { x, y, str, width, height } = c;
+          switch (_.parent.css()['text-decoration']) {
+            case 'underline':
+              this.ctx.fillRect(x, y + height - 3, width, 1);
+              break;
+          }
 
-        this.ctx.font = _.font();
-        this.ctx.fillText(_.displayContent(), x, y + height);
+          this.ctx.font = _.font();
+          this.ctx.fillText(str, x, y + height);
+
+          if (lastMousePos[0] >= x && lastMousePos[0] <= (x + width) && (lastMousePos[1] + scrollY) >= y && (lastMousePos[1] + scrollY) <= (y + height)) {
+            hoverText = true;
+            hoverEl = _.parent;
+
+            const newCursor = _.parent.css().cursor;
+            if (newCursor !== 'auto') cursor = newCursor;
+
+            let parent = _.parent;
+            while (parent) {
+              if (parent.tagName === 'a') {
+                hoverLink = parent;
+                break;
+              }
+              parent = parent.parent;
+            }
+          }
+        }
       }
 
       if (_.tagName === 'img' && _._image) {
         this.ctx.drawImage(_._image, x, y, width, height);
+
+        if (lastMousePos[0] >= x && lastMousePos[0] <= (x + width) && (lastMousePos[1] + scrollY) >= y && (lastMousePos[1] + scrollY) <= (y + height)) {
+          hoverEl = _;
+
+          const newCursor = _.css().cursor;
+            if (newCursor !== 'auto') cursor = newCursor;
+
+          let parent = _.parent;
+          while (parent) {
+            if (parent.tagName === 'a') {
+              hoverLink = parent;
+              break;
+            }
+            parent = parent.parent;
+          }
+        }
       }
 
       if (_.tagName === 'html') {
-        this.canvas.style.backgroundColor = this.ctx.fillStyle;
+        document.body.style.backgroundColor = this.ctx.fillStyle;
         // this.ctx.fillRect(x, y, width, height);
       }
 
@@ -199,7 +229,7 @@ export class Renderer {
     draw(this.layout);
 
     if (inspects.length > 0) inspects.pop()();
-    for (const x of doLast) x();
+    if (hoverLink) this.infoBox(hoverLink.href, 0, scrollY + cHeight);
 
     fpsFrameCount++;
     if (performance.now() > fpsLastUpdate + 1000 / fpsAcc) {
@@ -238,8 +268,8 @@ export class Renderer {
     const boxHeight = measure.height ?? (Math.abs(measure.fontBoundingBoxAscent) + Math.abs(measure.fontBoundingBoxDescent) + boxPaddingY * 2);
     let boxY = y - (alignBottom ? boxHeight : 0);
 
-    if (boxY > cHeight) {
-      boxY = cHeight - boxHeight;
+    if (boxY > scrollY + cHeight) {
+      boxY = scrollY + cHeight - boxHeight;
     }
 
     this.ctx.fillStyle = '#202124';
@@ -320,9 +350,13 @@ document.onmouseup = e => {
   lastMousePos = [ e.clientX, e.clientY ];
   e.preventDefault();
 
+  if (debug && hoverEl) {
+    window.t = hoverEl;
+  }
+
   if (hoverLink) {
-    if (hoverEl.attrs.target === '_parent' || e.ctrlKey) window.open(hoverEl.href.toString(), '_blank');
-      else window.load(hoverEl.href.toString());
+    if (hoverEl.attrs.target === '_parent' || e.ctrlKey) window.open(hoverLink.href.toString(), '_blank');
+      else window.load(hoverLink.href.toString());
   }
 
   if (hoverEl) {

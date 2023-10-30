@@ -36,7 +36,10 @@ const defaultProperties = {
   'border-left-width': '0px',
   'border-right-width': '0px',
 
-  'color-scheme': 'normal'
+  'color-scheme': 'normal',
+  'line-height': '1.2em',
+
+  'max-width': 'none'
 };
 
 const inheritedProperties = [ "azimuth", "border-collapse", "border-spacing", "caption-side", "color", "cursor", "direction", "elevation", "empty-cells", "font-family", "font-style", "font-variant", "font-weight", "font", "letter-spacing", "line-height", "list-style-image", "list-style-position", "list-style-type", "list-style", "orphans", "pitch-range", "pitch", "quotes", "richness", "speak-header", "speak-numeral", "speak-punctuation", "speak", "speech-rate", "stress", "text-align", "text-indent", "text-transform", "visibility", "voice-family", "volume", "white-space", "widows", "word-spacing", "color-scheme" ];
@@ -80,6 +83,9 @@ export class LayoutNode extends Node {
     cache('paddingTop'); cache('paddingBottom'); cache('paddingLeft'); cache('paddingRight');
     cache('displayContent');
     cache('colorScheme');
+    cache('lineHeight'); cache('maxWidth');
+    cache('availableParent'); cache('availableWidth'); cache('availableTotalWidth');
+    cache('textChunks'); cache('endX'); cache('endY');
 
     if (this.tagName === 'img') this.loadImage();
   }
@@ -305,64 +311,69 @@ export class LayoutNode extends Node {
       }
     };
 
-    switch (this.css()['white-space']) {
-      case 'normal':
-        let content = this.content;
-        let trimStart = false, trimEnd = false;
+    let content = this.content;
+    let trimStart = false, trimEnd = false;
 
-        if (true) {
-          let lastText;
-          let x = this;
-          while (x.parent) {
-            for (let i = x.parent.children.indexOf(x) - 1; i >= 0; i--) {
-              const y = x.parent.children[i];
-              const o = findTextNode(y);
-              if (o) {
-                lastText = o;
-                break;
-              }
-            }
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/white-space#formal_definition
+    // todo: remove end of line spaces?
+    // todo: use longer hand white-space-collapse
 
-            if (lastText) break;
+    const whiteSpace = this.css()['white-space']
+    const pre = whiteSpace === 'pre' || whiteSpace === 'pre-wrap';
 
-            x = x.parent;
+    if (!pre) {
+      let lastText;
+      let x = this;
+      while (x.parent) {
+        for (let i = x.parent.children.indexOf(x) - 1; i >= 0; i--) {
+          const y = x.parent.children[i];
+          const o = findTextNode(y);
+          if (o) {
+            lastText = o;
+            break;
           }
-
-          let nextText;
-          x = this;
-          while (x.parent) {
-            for (let i = x.parent.children.indexOf(x) + 1; i < x.parent.children.length; i++) {
-              const y = x.parent.children[i];
-              const o = findTextNode(y);
-              if (o) {
-                nextText = o;
-                break;
-              }
-            }
-
-            if (nextText) break;
-
-            x = x.parent;
-          }
-
-          trimStart = lastText && lastText.content.trimEnd() !== lastText.content;
-          trimEnd = nextText && nextText.content.trimStart() !== nextText.content;
         }
 
-        if (this.parent.isBlock() && this.parent.children.indexOf(this) === 0) trimStart = true;
-        if (this.parent.isBlock() && this.parent.children.indexOf(this) === this.parent.children.length - 1) trimEnd = true;
+        if (lastText) break;
 
-        if (trimStart) content = content.trimStart();
-        if (trimEnd) content = content.trimEnd();
+        x = x.parent;
+      }
 
-        content = content.replaceAll('&gt;', '>').replaceAll('&lt;', '<').replaceAll('&quot;', '"').replaceAll('&apos;', '\'')
-          .replace(/&#(x?)([A-Za-z0-9]+);/, (_, hex, digits) => String.fromCodePoint(hex ? parseInt(digits, 16) : digits));
+      let nextText;
+      x = this;
+      while (x.parent) {
+        for (let i = x.parent.children.indexOf(x) + 1; i < x.parent.children.length; i++) {
+          const y = x.parent.children[i];
+          const o = findTextNode(y);
+          if (o) {
+            nextText = o;
+            break;
+          }
+        }
 
-        return content.replace(/[\t\n\r]/g, ' ').replace(/ {2,}/g, ' ').replaceAll('&nbsp;', ' ');
+        if (nextText) break;
 
-      case 'pre':
-        return this.content;
+        x = x.parent;
+      }
+
+      trimStart = lastText && lastText.content.trimEnd() !== lastText.content;
+      trimEnd = nextText && nextText.content.trimStart() !== nextText.content;
+
+      // ???
+      if (this.parent.isBlock() && !this.siblingBefore) trimStart = true;
+      if (this.parent.isBlock() && !this.siblingAfter) trimEnd = true;
+
+      if (trimStart) content = content.trimStart();
+      if (trimEnd) content = content.trimEnd();
     }
+
+    content = content.replaceAll('&gt;', '>').replaceAll('&lt;', '<').replaceAll('&quot;', '"').replaceAll('&apos;', '\'')
+      .replace(/&#(x?)([A-Za-z0-9]+);/, (_, hex, digits) => String.fromCodePoint(hex ? parseInt(digits, 16) : digits));
+
+    content = content.replaceAll('\r\n', '\n');
+    if (!pre) content = content.replace(/[\t\n\r]/g, ' ').replace(/ {2,}/g, ' ');
+
+    return content.replaceAll('&nbsp;', ' ');
   }
 
   isBlock() {
@@ -405,7 +416,17 @@ export class LayoutNode extends Node {
       } else val += c;
     }
 
-    unit ||= 'px';
+    if (!unit) {
+      switch (property) {
+        case 'line-height':
+          unit = 'em';
+          break;
+
+        default:
+          unit = 'px';
+          break;
+      }
+    }
 
     val = parseFloat(val);
 
@@ -444,9 +465,9 @@ export class LayoutNode extends Node {
     if (this.siblingBefore?.marginBottom?.() > this.marginTop()) y -= this.marginTop();
 
     // ??
-    if (!this.siblingBefore && this.parent && this.marginTop() >= this.parent.marginTop()) {
+    if (!this.siblingBefore && this.parent) {
       y -= this.marginTop();
-      y += this.parent.marginTop();
+      // y += this.parent.marginTop();
     }
 
     return y;
@@ -472,6 +493,125 @@ export class LayoutNode extends Node {
     }
 
     return this._image?.height ?? 0;
+  }
+
+  lineHeight() {
+    return this.lengthAbs(this.css()['line-height'], 'line-height');
+  }
+
+  maxWidth() {
+    const val = this.css()['max-width'];
+    if (val === 'none') return undefined;
+
+    return this.lengthAbs(val, 'max-width');
+  }
+
+  availableParent() {
+    // get nearest block/non auto inline parent
+    let parent = this.parent;
+    while (true) {
+      if (parent.isBlock() || parent.css().width !== 'auto' || parent.maxWidth() !== undefined) break;
+      parent = parent.parent;
+    }
+
+    return parent;
+  }
+
+  availableTotalWidth() {
+    // get nearest block/non auto inline parent
+    let parent = this.availableParent();
+
+    // inline parents depend on our width so we do not care
+    // get total parent content width
+    let width = parent.maxWidth() ?? parent.contentWidth();
+
+    // - our horizontal spacing
+    width -= this.horizontalSpace(true);
+
+    return width;
+  }
+
+  // work out how much width
+  availableWidth() {
+    let parent = this.availableParent();
+
+    // inline parents depend on our width so we do not care
+    // get total parent content width
+    let width = parent.contentWidth();
+
+    // - our horizontal spacing
+    width -= this.horizontalSpace(true);
+
+    // - our x compared to parent x
+    width -= this.x() - parent.x();
+
+    return width;
+  }
+
+  // return an array of text chunks as { x, y, width, str }
+  textChunks() {
+    const chunks = [];
+
+    const startX = this.x();
+    const startY = this.y();
+
+    const parent = this.availableParent();
+    const baseX = parent.x() + parent.marginLeft() + parent.paddingLeft();
+
+    let available = this.availableWidth();
+
+    const text = this.displayContent();
+    const font = this.font();
+    const lineHeight = this.lineHeight();
+
+    let x = startX;
+    let y = startY;
+
+    let str = '', wrapNext = false, firstWord = false;
+
+    // hack: separate by word and newline but keep newline at the end of lines
+    const words = text.split(' ').flatMap(x => {
+      const out = [];
+      const spl = x.split('\n');
+      let i = 0;
+      for (const y of spl) {
+        out.push(y + (i < spl.length - 1 ? '\n' : ''));
+        i++;
+      }
+      return out;
+    });
+    for (const w of words) {
+      let add = (firstWord ? ' ' : '') + w;
+      let nextStr = str + add;
+
+      const measure = this.renderer.measureText(nextStr, font);
+
+      if (measure.width > available || wrapNext) {
+        wrapNext = false;
+        const finalMeasure = this.renderer.measureText(str, font);
+
+        chunks.push({ x, y, str, width: finalMeasure.width, height: lineHeight });
+        available = this.availableTotalWidth();
+        str = w;
+
+        x = baseX;
+        // y += measure.height;
+        y += this.lineHeight();
+      } else {
+        str = nextStr;
+      }
+
+      if (w.endsWith('\n')) wrapNext = true;
+
+      firstWord = true;
+    }
+
+    if (str) {
+      const measure = this.renderer.measureText(str, font);
+      chunks.push({ x, y, str, width: measure.width, height: lineHeight });
+    }
+
+    return chunks;
   }
 
   contentWidth() {
@@ -506,7 +646,30 @@ export class LayoutNode extends Node {
     if (this.tagName === 'img') return this.imageHeight();
 
     if (true) {
-      let height = 0, inlineBlock = 0;
+      let maxY;
+      if (this.children.length > 0) {
+        const target = this.children[this.children.length - 1];
+        // if (target.tagName === 'img') debugger;
+
+        maxY = target.endY();
+        if (!target.isBlock()) {
+          if (target.tagName === '#text') {
+            maxY += target.lineHeight();
+          } else {
+            maxY += target.height();
+          }
+        }
+      } else {
+        maxY = this.y();
+        // oh god what ??
+        // if (this.isBlock()) maxY += this.height() + this.marginBottom();
+      }
+
+      // maxY = this.collapseVerticalMargin(maxY);
+
+      return maxY - this.y();
+
+      /* let height = 0, inlineBlock = 0;
       for (const x of this.children) {
         if (x.isBlock()) {
           if (inlineBlock) {
@@ -525,7 +688,7 @@ export class LayoutNode extends Node {
         inlineBlock = 0;
       }
 
-      return height;
+      return height; */
     }
   }
 
@@ -533,7 +696,19 @@ export class LayoutNode extends Node {
     if (this.display() === 'none') return 0;
 
     // todo: min-width and max-width lol
-    if (this.tagName === '#text') return this.renderer.measureText(this.displayContent(), this.parent.font()).width;
+    if (this.tagName === '#text') {
+      const chunks = this.textChunks();
+
+      let minLeft = Infinity, maxRight = 0;
+      for (const c of chunks) {
+        minLeft = Math.min(minLeft, c.x);
+        maxRight = Math.max(maxRight, c.x + c.width);
+      }
+
+      return maxRight - minLeft;
+
+      // return this.renderer.measureText(this.displayContent(), this.parent.font()).width;
+    }
 
     return this.contentWidth() + this.horizontalSpace();
   }
@@ -541,7 +716,19 @@ export class LayoutNode extends Node {
   height() {
     if (this.display() === 'none') return 0;
 
-    if (this.tagName === '#text') return this.renderer.measureText(this.displayContent(), this.parent.font()).height;
+    if (this.tagName === '#text') {
+      const chunks = this.textChunks();
+
+      let minTop = Infinity, maxBottom = 0;
+      for (const c of chunks) {
+        minTop = Math.min(minTop, c.y);
+        maxBottom = Math.max(maxBottom, c.y + c.height);
+      }
+
+      return maxBottom - minTop;
+
+      // return this.renderer.measureText(this.displayContent(), this.parent.font()).height;
+    }
 
     return this.contentHeight() + this.verticalSpace();
   }
@@ -561,14 +748,49 @@ export class LayoutNode extends Node {
     return y;
   }
 
+  endX() {
+    if (this.tagName === '#text') {
+      const chunks = this.textChunks();
+      const lastChunk = chunks[chunks.length - 1];
+      return lastChunk.x + lastChunk.width;
+    }
+
+    if (this.children.length > 0) {
+      const lastChild = this.children[this.children.length - 1];
+      return lastChild.endX() + this.marginRight();
+    }
+
+    return this.x() + this.width() + this.marginRight();
+    // return this.x() + this.totalWidth();
+  }
+
+  endY() {
+    if (this.tagName === '#text') {
+      const chunks = this.textChunks();
+      const lastChunk = chunks[chunks.length - 1];
+      return lastChunk.y;
+    }
+
+    if (this.isInline() && this.children.length > 0) {
+      const lastChild = this.children[this.children.length - 1];
+      return lastChild.endY() + this.marginBottom();
+    }
+
+    let y = this.y();
+    if (this.isBlock()) y += this.height() + this.marginBottom();
+
+    // if (this.isBlock()) y += this.totalHeight();
+
+    return y;
+  }
+
   x() {
     const parent = this.parent ?? this.frame;
     if (!parent) return 0;
 
     let x = this.marginLeft();
     if (this.siblingBefore && this.siblingBefore.isInline() && this.isInline()) {
-      x += this.siblingBefore.x();
-      x += this.siblingBefore.width() + this.siblingBefore.marginRight();
+      x += this.siblingBefore.endX();
     } else {
       x += parent.x();
       x += parent.paddingLeft();
@@ -594,8 +816,8 @@ export class LayoutNode extends Node {
 
     let y = this.marginTop();
     if (this.siblingBefore) {
-      y += this.siblingBefore.y();
-      if (this.isBlock() || this.siblingBefore.isBlock()) y += this.siblingBefore.height() + this.siblingBefore.marginBottom();
+      y += this.siblingBefore.endY();
+      if (this.isBlock() && !this.siblingBefore.isBlock()) y += this.siblingBefore.height() + this.siblingBefore.marginBottom();
     } else {
       y += parent.y();
       y += parent.paddingTop();
