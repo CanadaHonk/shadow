@@ -1176,7 +1176,9 @@ export class LayoutNode extends Node {
 
     this.process();
 
-    this.invalidateCaches();
+    // probably should do but slow?
+    // this.invalidateCaches();
+    // this.parent.invalidateDirectCaches();
   }
 
   // todo: this section should all be document only!
