@@ -667,7 +667,7 @@ export class LayoutNode extends Node {
 
       // maxY = this.collapseVerticalMargin(maxY);
 
-      return maxY - this.y();
+      return maxY - this.y() - this.paddingTop();
 
       /* let height = 0, inlineBlock = 0;
       for (const x of this.children) {
