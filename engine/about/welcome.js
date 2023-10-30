@@ -3,9 +3,10 @@ const weeks = Math.floor(days / 7);
 
 const demos = [
   [ 'https://serenityos.org', 'looks pretty good' ],
+  [ 'https://serenityos.org/happy/1st/', 'a lot of text and images, looks good' ],
   [ 'https://info.cern.ch/hypertext/WWW/TheProject.html', 'basically spot on' ],
-  [ 'https://www.stroustrup.com', 'usable?' ],
-  [ 'https://cs.sjoy.lol', 'usable?' ],
+  // [ 'https://www.stroustrup.com', 'usable?' ],
+  // [ 'https://cs.sjoy.lol', 'usable?' ],
   [ 'https://mozilla.github.io/krakenbenchmark.mozilla.org/', 'older JS benchmark, takes ~1 min for host JS, very long for others' ]
 ];
 
@@ -81,7 +82,7 @@ export default () => `<title>Shadow</title>
 <ul>
 <li>tip: use browser controls (icons or alt+arrow key) to navigate forward/backward in history</li>
 <li>tip: ctrl+click a link to open in new tab (actual browser)</li>
-<li><a href="engine/ua.css" target="_parent">UA stylesheet</a></li>
+<li><a href="engine/ua.css">UA stylesheet</a></li>
 <li><a href="https://github.com/CanadaHonk/shadow" target="_parent">source code</a></li>
 </ul>
 
