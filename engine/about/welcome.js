@@ -2,9 +2,10 @@ const days = new Date(new Date() - new Date('2023-10-23')).getDate();
 const weeks = Math.floor(days / 7);
 
 const demos = [
-  [ 'https://serenityos.org', 'looks pretty good' ],
-  [ 'https://serenityos.org/happy/1st/', 'a lot of text and images, looks good' ],
-  [ 'https://info.cern.ch/hypertext/WWW/TheProject.html', 'basically spot on' ],
+  [ 'https://serenityos.org', 'basic - looks pretty good' ],
+  [ 'https://serenityos.org/happy/1st/', 'a lot of text and images - looks good' ],
+  [ 'https://serenityos.org/happy/2nd/', 'advanced-er CSS, plus JS - looks good' ],
+  // [ 'https://info.cern.ch/hypertext/WWW/TheProject.html', 'basically spot on' ],
   // [ 'https://www.stroustrup.com', 'usable?' ],
   // [ 'https://cs.sjoy.lol', 'usable?' ],
   [ 'https://mozilla.github.io/krakenbenchmark.mozilla.org/', 'older JS benchmark, takes ~1 min for host JS, very long for others' ]
