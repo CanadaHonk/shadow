@@ -465,9 +465,14 @@ export class LayoutNode extends Node {
     if (this.siblingBefore?.marginBottom?.() > this.marginTop()) y -= this.marginTop();
 
     // ??
-    if (!this.siblingBefore && this.parent) {
+    if (!this.siblingBefore && this.parent && this.marginTop() >= this.parent.marginTop()) {
+      // y -= this.parent.marginTop();
       y -= this.marginTop();
       // y += this.parent.marginTop();
+    }
+
+    if (!this.siblingBefore && this.parent && this.parent.marginTop() > this.marginTop()) {
+      y -= this.marginTop();
     }
 
     return y;
@@ -815,6 +820,8 @@ export class LayoutNode extends Node {
     if (!parent) return 0;
 
     let y = this.marginTop();
+    if (this.children[0]?.marginTop()) y = Math.max(y, this.children[0]?.marginTop());
+
     if (this.siblingBefore) {
       y += this.siblingBefore.endY();
       if (this.isBlock() && !this.siblingBefore.isBlock()) y += this.siblingBefore.height() + this.siblingBefore.marginBottom();
