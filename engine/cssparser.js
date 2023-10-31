@@ -85,9 +85,6 @@ export class CSSRule {
 
       if (conds.length > 0) sels.push({ type: cType, conds });
 
-      const TS = combs => combs.reduce((acc, x) => acc + `${x.type === 0 ? ' ' : ' > '}${x.conds[0]?.type === 0 ? '' : '#'}${x.conds[0]?.text}`, '').trim();
-      if (x.includes('*')) console.log(x, '|', sels, TS(sels));
-
       out.push(sels);
     }
 
