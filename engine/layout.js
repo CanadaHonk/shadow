@@ -973,7 +973,7 @@ export class LayoutNode extends Node {
   marginLeft() {
     const val = this.css()['margin-left'];
 
-    if (val === 'auto') {
+    if (this.isBlock() && val === 'auto') {
       return (this.parent.width() - this.width()) / 2;
     }
 
