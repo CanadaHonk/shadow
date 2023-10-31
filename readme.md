@@ -1,9 +1,13 @@
-# shadow
+# Shadow
 
-Shadow is a new novel browser engine made entirely in JS (mostly) from scratch.
+Shadow is a new novel web engine made (almost) entirely in JS from scratch.
 
-## [open it!](https://shadow.goose.icu)
+## [Try it in your browser!](https://shadow.goose.icu)
 (more info there)
+
+### Posts
+- [Introducing Shadow](https://goose.icu/introducing-shadow/)
+- [Shadow Devlog #1](https://goose.icu/shadow-devlog-1/)
 
 <!--
 ### next up
@@ -32,3 +36,4 @@ Shadow is a new novel browser engine made entirely in JS (mostly) from scratch.
 - https://cs.sjoy.lol (text good! styling bad)
 - https://www.stroustrup.com (okay content, not styling)
 - https://kevinlocke.name/
+- https://signal.org/ / https://signal.org/blog/
