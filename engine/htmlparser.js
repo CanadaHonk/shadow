@@ -259,7 +259,20 @@ export class HTMLParser {
             this.parent = this.parent.parent;
           }
 
-          this.parent = this.parent.parent;
+          if (this.parent.tagName !== closingName) console.warn(`HTMLParser: mismatched close. real: ${this.parent.tagName}, tag: ${closingName}`);
+
+          let parent = this.parent;
+          while (parent && parent.tagName !== closingName) {
+            parent = parent.parent;
+          }
+
+          if (!parent) {
+            // ignore
+          } else {
+            this.parent = parent.parent;
+          }
+
+          // this.parent = this.parent.parent;
           this.textNode = null;
 
           continue;
