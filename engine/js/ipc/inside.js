@@ -351,7 +351,8 @@ if (globalThis.setTimeout) {
       ret = e;
     }
 
-    ipc.send({ type: 'done', ret });
+    ipc.send({ type: 'done' });
+    // ipc.send({ type: 'done', ret });
   }, 100);
 } else {
   let timerLoop = makeWindowTimer(globalThis, sleep);
@@ -378,5 +379,6 @@ if (globalThis.setTimeout) {
     }
 
     ipc.send({ type: 'done', ret });
+    // ipc.send({ type: 'done', ret });
   }
 }
