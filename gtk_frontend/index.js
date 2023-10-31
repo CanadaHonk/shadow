@@ -233,7 +233,7 @@ const makeTab = url => {
 // notebook.setTabLabelText(vbox, 'hello');
 // window.add(notebook);
 
-window.setTitle('<shadow>');
+window.setTitle('shadow');
 
 window.add(vbox);
 
@@ -305,6 +305,8 @@ globalThis.document = {
               family = family.join(' ');
               if (family === 'sans-serif') family = 'sans';
 
+              // console.log(x, { style, weight, size, family });
+
               // const desc = Pango.fontDescriptionFromString(family);
 
               // todo: style
@@ -337,7 +339,7 @@ globalThis.document = {
 
             measureText: str => {
               layout.setText(str, -1);
-              // PangoCairo.updateLayout(ctx, layout);
+              PangoCairo.updateLayout(ctx, layout);
 
               let [ inkRect, logicalRect ] = layout.getExtents();
 
@@ -349,7 +351,7 @@ globalThis.document = {
               // console.log('a', Pango.SCALE);
               return {
                 width: logicalRect.width * (1 / Pango.SCALE),
-                height: logicalRect.height * (1 / Pango.SCALE)
+                height: inkRect.height * (1 / Pango.SCALE)
               };
             },
 
@@ -379,36 +381,74 @@ globalThis.document = {
 
               // ctx.showText(str);
               restorePath();
+            },
+
+            setTransform: (m11, m12, m21, m22, m41, m42) => {
+
+            },
+
+            translate: (x, y) => {
+
+            },
+
+            scale: (x, y) => {
+              // stub
             }
           };
         }
       })();
     }
-
-    /* if (tagName === 'canvas') {
-      const canvas = createCanvas(1280, 720);
-      canvas.style = {};
-      return canvas;
-    } */
   },
 
   body: {
-    appendChild: () => {}
+    appendChild: () => {},
+    style: {}
   }
 };
 
 // globalThis.requestAnimationFrame = f => setImmediate(f);
 globalThis.requestAnimationFrame = () => {};
 
-// globalThis.Image = Image;
+globalThis.matchMedia = query => {
+  switch (query) {
+    case '(prefers-color-scheme: dark)':
+      // todo
 
-// console.log(Reflect.ownKeys(window), Reflect.ownKeys(Gtk));
+    default:
+      return false;
+  }
+};
+
+globalThis.location = {
+  search: '',
+  href: 'https://shadow.goose.icu'
+};
+
+globalThis.history = {
+  replaceState: (state, _, url) => {},
+  pushState: (state, _, url) => {},
+};
+
+// stub fake dom elements
+globalThis.title_setter = {
+  set innerHTML(v) {},
+  set textContent(v) {}
+};
+
+globalThis.favicon_setter = {
+  set href(v) {}
+};
+
+globalThis.devicePixelRatio = 1;
+
+// stub image stuff
+globalThis.Image = class Image {
+  style = {};
+};
 
 await import('../engine/main.js');
 
-// window.on('draw', () => {
-
-let done = false;
+let oldWidth, oldHeight;
 drawingArea.on('draw', _ => {
   const width = drawingArea.getAllocatedWidth();
   const height = drawingArea.getAllocatedHeight();
@@ -419,28 +459,19 @@ drawingArea.on('draw', _ => {
   c.fillStyle = globalThis._renderer.layout.colorAbs('Canvas');
   c.fillRect(0, 0, width, height);
 
-  /* c.clearRect(0, 0, width, height);
+  globalThis.innerWidth = width;
+  globalThis.innerHeight = height;
 
-  c.fillStyle = 'yellow';
-  c.fillRect(10, 10, 100, 100);
+  if (width !== oldWidth || height !== oldHeight) {
+    globalThis.onresize();
 
-  c.fillStyle = 'black';
-  c.font = 'normal 16px monospace';
-  c.fillText('hello world!', 10, 200); */
-
-  globalThis._renderer.canvas.width = width;
-  globalThis._renderer.canvas.height = height;
+    oldWidth = width;
+    oldHeight = height;
+  }
 
   globalThis._renderer.update();
 
   drawingArea.queueDraw();
-
-  /*
-
-  if (!done) {
-
-    done = true;
-  } */
 
   return true;
 });

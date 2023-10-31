@@ -244,7 +244,7 @@ export class Renderer {
 
     if (debug || true) {
       this.ctx.fillStyle = this.layout.colorAbs('CanvasText');
-      this.ctx.font = 'normal 16px sans-serif';
+      this.ctx.font = 'normal normal 16px sans-serif';
       this.ctx.textBaseline = 'top';
       const str = `${fps}fps`;
       this.ctx.fillText(str, cWidth - this.ctx.measureText(str).width - 12, scrollY + 12);
@@ -257,7 +257,7 @@ export class Renderer {
   }
 
   infoBox(text, x = 0, y = 0, alignBottom = true) {
-    this.ctx.font = 'normal 12px sans-serif';
+    this.ctx.font = 'normal normal 12px sans-serif';
     this.ctx.textBaseline = 'bottom';
 
     const boxPadding = 3;
