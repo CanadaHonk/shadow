@@ -120,7 +120,19 @@ export class CSSParser {
   currentProp = '';
   currentValue = '';
 
-  constructor() {}
+  constructor(bailing = true) {
+    if (bailing) {
+      const _parse = this.parse.bind(this);
+      this.parse = (...args) => {
+        try {
+          return _parse(...args);
+        } catch (e) {
+          console.warn('CSSParser bailed', e);
+          return [];
+        }
+      };
+    }
+  }
 
   parse(input) {
     const checkToken = (a, b) => !this.escaping && this.stringState === StringState.None && a === b;
