@@ -84,12 +84,13 @@ export class HTMLParser {
       return false;
     };
 
-    const isspace = c => c === ' ' || c === '\n' || c === '\r';
+    const isspace = c => c === ' ' || c === '\n';
     const isclosing = c => c === '>' || c === '/';
 
     const isVoidEl = (name = this.currentName) => VOID_ELEMENTS.includes(name);
 
-    input = input.replace(/<!DOCTYPE .*?>/i, '').replace(/<!--[\w\W]*?-->/g, '');
+    input = input.replace(/<!DOCTYPE .*?>/i, '').replace(/<!--[\w\W]*?-->/g, '')
+      .replaceAll('\r\n', '\n').replaceAll('\r', '\n'); // normalize newlines
 
     for (let i = 0; i < input.length; i++) {
       const peek = () => input[i + 1];
