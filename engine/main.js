@@ -72,7 +72,7 @@ const _load = async (url, baseUrl = null, push = true) => {
   switch (res.headers.get('Content-Type').split(';')[0]) {
     case 'text/javascript':
     case 'text/css':
-      html = `<body><pre>${await res.text()}</pre></body>`;
+      html = `<meta name="color-scheme" content="dark light"><body><pre>${await res.text()}</pre></body>`;
       break;
 
     default:
