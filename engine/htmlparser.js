@@ -110,6 +110,17 @@ export class HTMLParser {
             continue;
           }
 
+          if (isclosing(c)) {
+            this.currentNode.setAttr(this.currentAttrName, true);
+
+            this.attrState = AttrState.None;
+
+            if (isclosing(c)) i--;
+
+            this.escaping = false;
+            continue;
+          }
+
           this.currentAttrName += c.toLowerCase();
 
           this.escaping = false;
