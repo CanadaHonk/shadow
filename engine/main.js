@@ -53,7 +53,7 @@ const _load = async (url, baseUrl = null, push = true) => {
   if (url.startsWith('about:')) {
     const page = url.slice('about:'.length).split('?')[0];
     const html = AboutPages[page] ? AboutPages[page]({ url }) : `<span>about: page not found</span>`;
-    realURL = 'data:text/html;base64,' + btoa(html);
+    realURL = 'data:text/html,' + encodeURIComponent(html);
     push = false;
   }
 
