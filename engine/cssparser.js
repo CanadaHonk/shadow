@@ -16,6 +16,7 @@ export const SelectorType = {
   Id: 1,
   Class: 2,
   Universal: 3,
+  Pseudo: 4,
 };
 
 export const CombinatorType = {
@@ -54,8 +55,6 @@ export class CSSRule {
       for (let i = 0; i < x.length; i++) {
         const c = x[i];
 
-        // if (x.includes'#a > div') console.log({c, text, conds, cType, sType});
-
         if (isCombinator(c) && text && (c !== ' ' || (!isCombinator(x[i + 1]) && !isspace(x[i + 1])))) {
           pushCond();
 
@@ -68,7 +67,7 @@ export class CSSRule {
           continue;
         }
 
-        if (['#', '.', '*'].includes(c) || i === x.length - 1) {
+        if (['#', '.', '*', ':'].includes(c) || i === x.length - 1) {
           if (i === x.length - 1) text += c;
 
           if (c === '*') sType = SelectorType.Universal;
@@ -76,6 +75,7 @@ export class CSSRule {
 
           if (c === '#') sType = SelectorType.Id;
           if (c === '.') sType = SelectorType.Class;
+          if (c === ':') sType = SelectorType.Pseudo;
 
           continue;
         }
