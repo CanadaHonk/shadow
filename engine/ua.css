@@ -1,7 +1,6 @@
 /* we have EVERYTHING inside UA */
 
-/* :root */
-html {
+:root {
   background-color: Canvas;
   color: CanvasText;
 
@@ -20,6 +19,15 @@ body {
 br {
   display: block;
 }
+
+:any-link {
+  color: LinkText;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+:visited { color: VisitedText; } /* unsupported */
+:link:active, :visited:active { color: ActiveText; } /* unsupported */
 
 /* https://html.spec.whatwg.org/multipage/rendering.html#non-replaced-elements */
 address, blockquote, center, dialog, div, figure, figcaption, footer, form,
@@ -58,23 +66,12 @@ sub { vertical-align: sub; }
 sup { vertical-align: super; }
 sub, sup { line-height: normal; font-size: smaller; }
 
-/* :link { color: #0000EE; }
-:visited { color: #551A8B; }
-:link:active, :visited:active { color: #FF0000; }
-:link, :visited { text-decoration: underline; cursor: pointer; } */
-
 button {
   cursor: pointer;
   padding: 1px 6px;
   background-color: ButtonFace;
   color: ButtonText;
   font-size: smaller;
-}
-
-a {
-  color: LinkText;
-  text-decoration: underline;
-  cursor: pointer;
 }
 
 ins, u { text-decoration: underline; }
