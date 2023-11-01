@@ -38,9 +38,6 @@ const _load = async (url, baseUrl = null, push = true) => {
   // wipe current page
   _js.stopAll();
 
-  // go to top of page
-  scrollY = 0;
-
   /* const mock = new LayoutNode({}, renderer);
   mock.document = { cssRules: [] };
   mock.root = mock;

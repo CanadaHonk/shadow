@@ -1364,6 +1364,10 @@ export const constructLayout = async (document, renderer) => {
 
   await doc.process();
 
+  // go to top of page
+  scrollY = 0;
+  if (window.onresize) window.onresize(); // hack: update it
+
   renderer.layout = doc;
 
   const body = doc.querySelector('body');
