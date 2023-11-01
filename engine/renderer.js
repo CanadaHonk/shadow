@@ -75,6 +75,8 @@ export class Renderer {
       this.measureCtx = ctx;
     }
 
+    this.measureCtx.textAlign = 'left';
+    this.measureCtx.textBaseline = 'baseline';
     this.measureCtx.font = font;
     const measure = this.measureCtx.measureText(text);
 
