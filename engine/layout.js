@@ -1,5 +1,5 @@
 import { Document, Node } from './dom.js';
-import { CSSParser, CSSRule, SelectorType, CombinatorType } from './cssparser.js';
+import { CSSParser, CSSRule, SelectorType, CombinatorType, RuleType } from './cssparser.js';
 import { HTMLParser } from './htmlparser.js';
 
 const uaRaw = globalThis.node ? (await import('fs')).readFileSync(globalThis.uaPath, 'utf8') : await (await fetch('engine/ua.css')).text();
@@ -135,8 +135,6 @@ export class LayoutNode extends Node {
   //   conditions (a#bc)
   //    condition (#b)
   matchesCSS(selectors) {
-    let target = this;
-
     selectorLoop: for (const _combs of selectors) { // a, b, c (a OR b OR c)
       // reverse so:
       //   a > b > c (parent --> child)
@@ -149,7 +147,7 @@ export class LayoutNode extends Node {
       if (!this.testCSSConditions(first.conds)) continue;
 
       let lastCType = first.type;
-      target = target.parent;
+      let target = this.parent;
       combCheck: for (const comb of combs) {  // c > b a
         parentCheck: while (target) {
           switch (lastCType) {
@@ -255,13 +253,41 @@ export class LayoutNode extends Node {
 
     if (this.tagName === '#text') return this._cssCache = props;
 
-    for (const x of rules) {
-      if (this.matchesCSS(x.selectors)) {
+    const checkRule = rule => {
+      if (this.matchesCSS(rule.selectors)) {
         props = {
           ...props,
-          ...x.properties
+          ...rule.properties
         };
       }
+    };
+
+    for (const rule of rules) {
+      // at rule
+      if (rule.type === RuleType.NestedAt) {
+        // check we match it
+        switch (rule.atName) {
+          case 'media':
+            // todo
+
+          default:
+            console.warn(`layout: unsupported @rule: ${rule.atName}`);
+            continue;
+        }
+
+        for (const x of rule.rules) {
+          checkRule(x);
+        }
+
+        continue;
+      }
+
+      if (rule.type === RuleType.RegularAt) {
+        // ignore for now as we support none
+        continue;
+      }
+
+      checkRule(rule);
     }
 
     if (this.tagName === 'font') {
