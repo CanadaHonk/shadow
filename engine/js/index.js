@@ -24,4 +24,4 @@ export const run = async (doc, js) => {
 };
 
 // setBackend('spidermonkey');
-setBackend('host');
+if (!globalThis.node) setBackend('host');
