@@ -104,11 +104,25 @@ export class LayoutNode extends Node {
   }
 
   testCSSConditions(conds) {
+    const pseudoCheck = text => {
+      switch (text) {
+        case 'root':
+          return this.tagName === 'html';
+
+        case 'link': // we have no history recorded (yet)
+        case 'any-link':
+          return this.tagName === 'a' && !!this.attrs.href;
+      }
+
+      return false;
+    };
+
     for (const x of conds) { // a#b.c (a AND b AND c)
       if (
         !(x.type === SelectorType.Tag && this.tagName === x.text) && // tag
         !(x.type === SelectorType.Id && this.id === x.text) && // id
         !(x.type === SelectorType.Class && this.hasClass(x.text)) && // class
+        !(x.type === SelectorType.Pseudo && pseudoCheck(x.text)) && // pseudo classes
         !(x.type === SelectorType.Universal) // universal (*)
       ) return false;
     }
