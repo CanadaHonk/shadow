@@ -12,22 +12,22 @@ Shadow is a new novel web engine made (almost) entirely in JS from scratch.
 <!--
 ### next up
 
-- :root
-- :link
-- :hover
+- :hover, :active
+- border
+- css var()
+- box-shadow
+- text-shadow
 - li markers (list-style-type)
 - margin-inline, margin-block (hack: -> margin?)
-- text-align
-- line-height
 - rem unit
 - center element
 - bgColor, fgColor
 - fixed length units (cm, in, etc)
 - max width/max height
-- text wrapping (!)
 - text highlighting (!)
 * popups when using keybinds to notify info
 * inspect dom tree panel
+* status bar?
 * setting for how early but broken or late but good to show a page
 
 ### to investigate
@@ -37,3 +37,9 @@ Shadow is a new novel web engine made (almost) entirely in JS from scratch.
 - https://www.stroustrup.com (okay content, not styling)
 - https://kevinlocke.name/
 - https://signal.org/ / https://signal.org/blog/
+- https://research.swtch.com/nih
+- https://notes.valdikss.org.ru/jabber.ru-mitm/
+- https://servo.org
+- https://ladybird.dev
+- https://www.ekioh.com/flow-browser/
+- https://whatwg.org/
