@@ -2,13 +2,24 @@ const MainState = {
   None: 0,
   Property: 1,
   Value: 2,
-  AtRule: 3
 };
 
 const StringState = {
   None: 0,
   Single: 1,
-  Double: 2
+  Double: 2,
+};
+
+const AtState = {
+  None: 0,
+  Name: 1,
+  Cond: 2,
+};
+
+export const RuleType = {
+  None: 0,
+  NestedAt: 1,
+  RegularAt: 2,
 };
 
 export const SelectorType = {
@@ -24,14 +35,17 @@ export const CombinatorType = {
   Child: 1,
 };
 
-const isspace = c => c === ' ';
+const isspace = c => c === ' ' || c === '\n';
 
 export class CSSRule {
+  type = RuleType.None;
   selectors = [];
   properties = {};
 
   static parseSelector(input) {
-    input = input.trim();
+    input = input.trim()
+      .replaceAll('\r\n', '\n'); // normalize newlines
+
     const out = [];
 
     for (let x of input.split(',')) {
@@ -104,18 +118,46 @@ export class CSSRule {
   }
 }
 
+class CSSRegularAtRule {
+  type = RuleType.NestedAt;
+  atName = '';
+  atCond = '';
+
+  constructor(name, cond) {
+    this.atName = name;
+    this.atCond = cond;
+  }
+}
+
+class CSSNestedAtRule {
+  type = RuleType.NestedAt;
+  atName = '';
+  atCond = '';
+  rules = [];
+
+  constructor(name, cond) {
+    this.atName = name;
+    this.atCond = cond;
+  }
+}
+
 export class CSSParser {
   mainState = MainState.None;
   stringState = StringState.None;
+  atState = AtState.None;
   escaping = false;
 
   currentSelector = '';
 
   rules = [];
   currentRule = null;
+  parentRule = null;
 
   currentProp = '';
   currentValue = '';
+
+  currentAtName = '';
+  currentAtCond = '';
 
   constructor(bailing = true) {
     if (bailing) {
@@ -181,12 +223,62 @@ export class CSSParser {
         this.currentSelector = '';
       };
 
+      switch (this.atState) {
+        case AtState.Name: {
+          // begin nested cond `(...)`
+          if (checkToken(c, '(')) {
+            this.currentAtCond = '(';
+
+            this.atState = AtState.Cond;
+            continue;
+          }
+
+          // begin regular cond `['"]...['"]` or ` ...`
+          if (checkToken(c, '"') || checkToken(c, '\'') || isspace(c)) {
+            this.atState = AtState.Cond;
+            continue;
+          }
+
+          this.currentAtName += c;
+          continue;
+        }
+
+        case AtState.Cond: {
+          if (checkToken(c, '{')) {
+            this.currentAtCond = this.currentAtCond.trim();
+
+            // if we began and ended with (), slice them off
+            if (this.currentAtCond.startsWith('(') && this.currentAtCond.endsWith(')')) {
+              this.currentAtCond = this.currentAtCond.slice(1, -1).trim();
+            }
+
+            this.parentRule = new CSSNestedAtRule(this.currentAtName, this.currentAtCond);
+            this.rules.push(this.parentRule);
+
+            this.atState = AtState.None;
+            this.mainState = MainState.None;
+            continue;
+          }
+
+          // todo: also check for EOF?
+          if (checkToken(c, ';')) {
+            this.currentRule = new CSSRegularAtRule(this.currentAtName, this.currentAtCond);
+            this.rules.push(this.currentRule);
+
+            this.atState = AtState.None;
+            this.mainState = MainState.None;
+            continue;
+          }
+
+          this.currentAtCond += c;
+          continue;
+        }
+      }
+
       switch (this.mainState) {
         case MainState.Property: {
           if (checkToken(c, ':')) {
             this.mainState = MainState.Value;
-
-            this.escaping = false;
             continue;
           }
 
@@ -194,8 +286,6 @@ export class CSSParser {
             finishRule();
 
             this.mainState = MainState.None;
-
-            this.escaping = false;
             continue;
           }
 
@@ -210,8 +300,6 @@ export class CSSParser {
             finishRule();
 
             this.mainState = c === ';' ? MainState.Property : MainState.None;
-
-            this.escaping = false;
             continue;
           }
 
@@ -224,20 +312,24 @@ export class CSSParser {
         case MainState.None: {
           // selector or at rule
           if (checkToken(c, '@')) {
-            // if (this.currentSelector.length !== 0) throw new Error('unexpected symbol @');
+            this.currentAtName = '';
+            this.currentAtCond = '';
 
-            // this.mainState = MainState.AtRule;
-
-            throw new Error('@rules are unsupported!');
+            this.atState = AtState.Name;
+            continue;
           }
 
-          if (checkToken(c, '{')) {
-            this.mainState = MainState.Property;
-
+          if (checkToken(c, '{') && this.currentSelector.trim()) {
             this.currentRule = new CSSRule(this.currentSelector);
-            this.rules.push(this.currentRule);
+            (this.parentRule ? this.parentRule.rules : this.rules).push(this.currentRule);
 
-            this.escaping = false;
+            this.mainState = MainState.Property;
+            continue;
+          }
+
+          if (checkToken(c, '}')) { // closing at rule (or rogue) }
+            if (this.parentRule) this.parentRule = null;
+
             continue;
           }
 
