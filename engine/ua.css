@@ -26,8 +26,8 @@ br {
   cursor: pointer;
 }
 
-:visited { color: VisitedText; } /* unsupported */
-:link:active, :visited:active { color: ActiveText; } /* unsupported */
+:visited { color: VisitedText; } /* unsupported atm */
+:link:active, :visited:active { color: ActiveText; } /* unsupported atm */
 
 /* https://html.spec.whatwg.org/multipage/rendering.html#non-replaced-elements */
 address, blockquote, center, dialog, div, figure, figcaption, footer, form,
