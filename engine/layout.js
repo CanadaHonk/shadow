@@ -45,7 +45,7 @@ const defaultProperties = {
   right: 'auto',
 
   'color-scheme': 'normal',
-  'line-height': '1.2em',
+  'line-height': 'normal',
 
   'max-width': 'none'
 };
@@ -94,6 +94,7 @@ export class LayoutNode extends Node {
     cache('lineHeight'); cache('maxWidth');
     cache('availableParent'); cache('availableWidth'); cache('availableTotalWidth');
     cache('textChunks'); cache('endX'); cache('endY');
+    cache('font');
 
     if (this.tagName === 'img') this.loadImage();
   }
@@ -517,7 +518,13 @@ export class LayoutNode extends Node {
   }
 
   lineHeight() {
-    return this.lengthAbs(this.css()['line-height'], 'line-height');
+    let val = this.css()['line-height'];
+    if (val === 'normal') {
+      // get default line-height based on font properties (lol)
+      return this.renderer.measureText('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', this.font()).height;
+    }
+
+    return this.lengthAbs(val, 'line-height');
   }
 
   maxWidth() {
@@ -617,7 +624,7 @@ export class LayoutNode extends Node {
 
         x = baseX;
         // y += measure.height;
-        y += this.lineHeight();
+        y += lineHeight;
       } else {
         str = nextStr;
       }
