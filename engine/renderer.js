@@ -424,5 +424,5 @@ window.onresize = () => {
   window._renderer.ctx.setTransform(renderScale, 0, 0, renderScale, 0, 0);
   window._renderer.ctx.translate(0, -scrollY);
 
-  window._renderer.layout.invalidateCaches();
+  window._renderer.layout?.invalidateCaches?.();
 };
