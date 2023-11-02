@@ -584,7 +584,8 @@ export class LayoutNode extends Node {
     let val = this.css()['line-height'];
     if (val === 'normal') {
       // get default line-height based on font properties (lol)
-      return this.renderer.measureText('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', this.font()).height;
+      // return this.renderer.measureText('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', this.font()).height;
+      return Math.ceil(this.renderer.measureText('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', this.font()).height) + 1;
     }
 
     return this.lengthAbs(val, 'line-height');
