@@ -1005,7 +1005,14 @@ export class LayoutNode extends Node {
   }
 
   backgroundColor() {
-    return this.colorAbs(this.css()['background-color']);
+    let val = this.css()['background-color'];
+    if (this.tagName === 'html' && (!val || val === 'Canvas')) {
+      // try to use body bg color if html bg color is not set (???)
+      const bodyVal = this.querySelector('body')?.css?.()?.['background-color'];
+      if (bodyVal) val = bodyVal;
+    }
+
+    return this.colorAbs(val);
   }
 
   _image;
