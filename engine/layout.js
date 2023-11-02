@@ -749,7 +749,10 @@ export class LayoutNode extends Node {
     if (true) {
       let maxY;
       if (this.children.length > 0) {
-        const target = this.children[this.children.length - 1];
+        let target = this.children[this.children.length - 1];
+        while (target.css().display === 'none') {
+          target = target.siblingBefore;
+        }
 
         maxY = target.endY();
         if (!target.isBlock()) {
