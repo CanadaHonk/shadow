@@ -95,12 +95,14 @@ export class LayoutNode extends Node {
     cache('availableParent'); cache('availableWidth'); cache('availableTotalWidth');
     cache('textChunks'); cache('endX'); cache('endY');
     cache('font');
-
-    if (this.tagName === 'img') this.loadImage();
   }
 
   getFromPtr(ptr) {
     return byPtr[ptr];
+  }
+
+  isImage() {
+    return this.tagName === 'img' || this.tagName === 'svg';
   }
 
   testCSSConditions(conds) {
@@ -278,7 +280,7 @@ export class LayoutNode extends Node {
             // todo
 
           default:
-            console.warn(`layout: unsupported @rule: ${rule.atName}`);
+            // console.warn(`layout: unsupported @rule: ${rule.atName}`);
             continue;
         }
 
@@ -706,7 +708,7 @@ export class LayoutNode extends Node {
   contentWidth() {
     if (this.tagName === 'document') return this.renderer.canvas.width;
 
-    if (this.tagName === 'img') return this.imageWidth();
+    if (this.isImage()) return this.imageWidth();
 
     // manually set width
     if (this.css().width !== 'auto') {
@@ -726,7 +728,7 @@ export class LayoutNode extends Node {
   }
 
   contentHeight() {
-    if (this.tagName === 'img') return this.imageHeight();
+    if (this.isImage()) return this.imageHeight();
 
     if (this.css().height !== 'auto') {
       return this.lengthAbs(this.css().height, 'height');
@@ -736,7 +738,6 @@ export class LayoutNode extends Node {
       let maxY;
       if (this.children.length > 0) {
         const target = this.children[this.children.length - 1];
-        // if (target.tagName === 'img') debugger;
 
         maxY = target.endY();
         if (!target.isBlock()) {
@@ -1021,11 +1022,28 @@ export class LayoutNode extends Node {
 
     this._image = null;
 
-    const res = await this.document.page.fetch(this.attrs.src);
-    const type = res.headers.get('Content-Type');
-    const data = await res.arrayBuffer();
+    let blob;
+    switch (this.tagName) {
+      case 'img': {
+        const res = await this.document.page.fetch(this.attrs.src);
+        const type = res.headers.get('Content-Type');
+        const data = await res.arrayBuffer();
 
-    const blob = new Blob([ new Uint8Array(data) ], { type });
+        blob = new Blob([ new Uint8Array(data) ], { type });
+        break;
+      }
+
+      // hack: load svg from content
+      case 'svg': {
+        const svg = this.serialize(false);
+        this.children = [];
+
+        console.log(svg);
+
+        blob = new Blob([ svg ], { type: 'image/svg+xml' });
+        break;
+      }
+    }
 
     const image = new Image();
     image.src = URL.createObjectURL(blob);
@@ -1113,10 +1131,7 @@ export class LayoutNode extends Node {
     this.appendChild(text);
   }
 
-  get innerHTML() {
-    // perf todo:
-    //  - cache this, invalidate on self/child change
-
+  serialize(shouldEscapeText = true) {
     // https://html.spec.whatwg.org/#escapingString
     const escapeString = (str, attribute = false) => {
       // Replace any occurrence of the "&" character by the string "&amp;".
@@ -1146,63 +1161,84 @@ export class LayoutNode extends Node {
     // 2. Let s be a string, and initialize it to the empty string.
     let s = '';
 
-    // 4. For each child node of the node, in tree order, run the following steps:
-    for (const child of this.children) {
-      if (child.tagName === '#text') {
-        // If current node is a Text node
-        if (
-          // If the parent of current node is a style, script, xmp, iframe, noembed, noframes, or plaintext element
-          ['style', 'script', 'xmp', 'iframe', 'noembed', 'noframes', 'plaintext'].includes(this.tagName) ||
+    if (this.tagName === '#text') {
+      // If current node is a Text node
+      if (
+        // If the parent of current node is a style, script, xmp, iframe, noembed, noframes, or plaintext element
+        ['style', 'script', 'xmp', 'iframe', 'noembed', 'noframes', 'plaintext'].includes(this.tagName) ||
 
-          // todo: or if the parent of current node is a noscript element and scripting is enabled for the node
-          false
-        ) {
-          s += child.content;
-        } else {
-          s += escapeString(child.content);
-        }
+        // todo: or if the parent of current node is a noscript element and scripting is enabled for the node
+        false ||
 
-        continue;
+        // forced by argument
+        !shouldEscapeText
+      ) {
+        s += this.content;
+      } else {
+        s += escapeString(this.content);
       }
 
-      // Append a U+003C LESS-THAN SIGN character (<), followed by tagname.
-      s += '<' + child.tagName;
+      return s;
+    }
 
-      // For each attribute that the element has
-      for (const attr in child.attrs) {
-        // append a U+0020 SPACE character
-        s += ' ';
+    // Append a U+003C LESS-THAN SIGN character (<), followed by tagname.
+    s += '<' + this.tagName;
 
-        // the attribute's (serialized) name
-        s += attr;
+    // For each attribute that the element has
+    for (const attr in this.attrs) {
+      // append a U+0020 SPACE character
+      s += ' ';
 
-        // a U+003D EQUALS SIGN character (=), a U+0022 QUOTATION MARK character (")
-        s += '="';
+      // the attribute's (serialized) name
+      s += attr;
 
-        // the attribute's value, escaped as described below in attribute mode
-        s += escapeString(child.attrs[attr]);
+      // a U+003D EQUALS SIGN character (=), a U+0022 QUOTATION MARK character (")
+      s += '="';
 
-        // and a second U+0022 QUOTATION MARK character (").
-        s += '"';
+      // the attribute's value, escaped as described below in attribute mode
+      s += escapeString(this.attrs[attr]);
+
+      // and a second U+0022 QUOTATION MARK character (").
+      s += '"';
+    }
+
+    // Append a U+003E GREATER-THAN SIGN character (>).
+    s += '>';
+
+    // If current node serializes as void, then continue on to the next child node at this point.
+    if (!this.voidElement) {
+      // Append the value of running the HTML fragment serialization algorithm on the current node element
+      for (const child of this.children) {
+        s += child.serialize(shouldEscapeText);
       }
 
-      // Append a U+003E GREATER-THAN SIGN character (>).
+      // followed by a U+003C LESS-THAN SIGN character (<), a U+002F SOLIDUS character (/)
+      s += '</';
+
+      // tagname again
+      s += this.tagName;
+
+      // and finally a U+003E GREATER-THAN SIGN character (>)
       s += '>';
+    }
 
-      // If current node serializes as void, then continue on to the next child node at this point.
-      if (!child.voidElement) {
-        // Append the value of running the HTML fragment serialization algorithm on the current node element
-        s += child.innerHTML;
+    return s;
+  }
 
-        // followed by a U+003C LESS-THAN SIGN character (<), a U+002F SOLIDUS character (/)
-        s += '</';
+  get outerHTML() {
+    return this.serialize();
+  }
 
-        // tagname again
-        s += child.tagName;
+  get innerHTML() {
+    // perf todo:
+    //  - cache this, invalidate on self/child change
 
-        // and finally a U+003E GREATER-THAN SIGN character (>)
-        s += '>';
-      }
+    if (this.voidElement) return '';
+
+    let s = '';
+
+    for (const child of this.children) {
+      s += child.serialize();
     }
 
     return s;
@@ -1372,6 +1408,8 @@ export class LayoutNode extends Node {
 
       this.children = [];
     }
+
+    if (this.isImage()) this.loadImage();
 
     for (const x of this.children) await x.process();
   }
