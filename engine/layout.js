@@ -467,7 +467,7 @@ export class LayoutNode extends Node {
   }
 
   // technically <length-percentage> but uhm yeah
-  lengthAbs(i, property) {
+  lengthAbs(i, property, parent = this.parent) {
     const x = this.resolveValue(i);
 
     if (property === 'font-size') {
@@ -514,13 +514,24 @@ export class LayoutNode extends Node {
       case 'px': return val;
 
       case '%':
+        let prop = property;
+
+        if (prop === 'top' || prop === 'bottom') {
+          // prop = 'height';
+          return window.innerHeight * (val / 100);
+        }
+        if (prop === 'left' || prop === 'right') {
+          // prop = 'width';
+          return window.innerWidth * (val / 100);
+        }
+
         // (val / 100) * parent property value
-        return this.parent[propToFunc(property)] * (val / 100);
+        return parent[propToFunc(prop)] * (val / 100);
 
       case 'em':
         if (property === 'font-size') {
           // val * parent font size
-          return this.parent.fontSize() * val;
+          return parent.fontSize() * val;
         }
 
         // val * node font size
@@ -886,10 +897,10 @@ export class LayoutNode extends Node {
       const relativeRoot = this.document;
 
       const left = this.css().left;
-      if (left !== 'auto') return relativeRoot.x() + this.lengthAbs(left, 'left');
+      if (left !== 'auto') return relativeRoot.x() + this.lengthAbs(left, 'left', relativeRoot);
 
       const right = this.css().right;
-      if (right !== 'auto') return relativeRoot.x() + relativeRoot.width() - this.lengthAbs(right, 'right') - this.totalWidth();
+      if (right !== 'auto') return relativeRoot.x() + relativeRoot.width() - this.lengthAbs(right, 'right', relativeRoot) - this.totalWidth();
 
       return 0;
     }
@@ -943,10 +954,10 @@ export class LayoutNode extends Node {
       const relativeRoot = this.document;
 
       const top = this.css().top;
-      if (top !== 'auto') return relativeRoot.y() + this.lengthAbs(top, 'top');
+      if (top !== 'auto') return relativeRoot.y() + this.lengthAbs(top, 'top', relativeRoot);
 
       const bottom = this.css().bottom;
-      if (bottom !== 'auto') return relativeRoot.y() + relativeRoot.height() + this.lengthAbs(bottom, 'bottom') - this.totalHeight();
+      if (bottom !== 'auto') return relativeRoot.y() + relativeRoot.height() + this.lengthAbs(bottom, 'bottom', relativeRoot) - this.totalHeight();
 
       return 0;
     }
