@@ -1398,7 +1398,7 @@ export const constructLayout = async (document, renderer) => {
   };
 
   const doc = assembleLayoutNodes(document);
-  doc.root = doc.children[0];
+  doc.root = doc.querySelector('html');
 
   const reSetDoc = x => {
     x.document = doc;
