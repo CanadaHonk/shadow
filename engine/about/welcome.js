@@ -88,9 +88,6 @@ export default () => `<title>Shadow</title>
 <h2>components of Shadow</h2>
 <img width=800 src="https://mermaid.ink/svg/pako:eNpVkT1vhDAMhv8KygxVaTuB1Kljp96axSLukQtJUByK0N399zogFJAyOI_f1x_yXXReoWjENcDYF98_rXRF0YH7A6peqs_eU0zEYZx9MNpdj5R6UH6uGEQ7jBAIwwlnV8LKW2YdUVZmH2c4vzbfBYwGWPwUszn_t4hRQKcwbOX2-KQ8wG2vBGcgmzahUXPSemdwOXKjkXDIjR9-jJV2j9vqvlEed42TTbp1Lu3MJS4DFq9lXdb83gqKwRtsAqr2LKnfy_pjT_MFllaUwvI8oBXf5J7UUsQeLUrRcKggGCmke7IOpugvi-tEE8OEpZhGBRG_NHAhK5pfGAif_zYlpas" alt="Component flowchart">
 
-<h2>implemented</h2>
-<ul>${supported.map(x => `<li>${x.replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</li>`).join('\n')}</ul>
-
 <style>
 body {
   font-family: sans-serif;
