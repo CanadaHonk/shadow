@@ -199,14 +199,14 @@ export class Renderer {
         }
       }
 
-      if (_.tagName === 'img' && _._image) {
+      if (_.isImage() && _._image) {
         this.ctx.drawImage(_._image, x, y, width, height);
 
         if (lastMousePos[0] >= x && lastMousePos[0] <= (x + width) && (lastMousePos[1] + scrollY) >= y && (lastMousePos[1] + scrollY) <= (y + height)) {
           hoverEl = _;
 
           const newCursor = _.css().cursor;
-            if (newCursor !== 'auto') cursor = newCursor;
+          if (newCursor !== 'auto') cursor = newCursor;
 
           let parent = _.parent;
           while (parent) {
@@ -217,6 +217,8 @@ export class Renderer {
             parent = parent.parent;
           }
         }
+
+        return;
       }
 
       if (_.tagName === 'html') {
