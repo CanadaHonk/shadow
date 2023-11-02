@@ -245,6 +245,13 @@ export class LayoutNode extends Node {
         if (!inherited[x] && css[x]) inherited[x] = css[x];
       }
 
+      // cache css variables in us
+      // todo: experiment if this is slower/faster. leave for now
+      /* const keys = Object.keys(css);
+      for (const x of keys) {
+        if (x.startsWith('--') && !inherited[x] && css[x]) inherited[x] = css[x];
+      } */
+
       parent = parent.parent;
     }
 
@@ -335,6 +342,20 @@ export class LayoutNode extends Node {
       const args = this.resolveValue(rawArgs).split(',').map(x => x.trim());
 
       switch (func) {
+        case 'var': {
+          const [ name, fallback ] = args;
+
+          let parent = this;
+          while (parent) {
+            let value = parent.css()[name];
+            if (value) return value;
+
+            parent = parent.parent;
+          }
+
+          return fallback ?? _;
+        }
+
         case 'light-dark': return args[colorScheme === 'light' ? 0 : 1];
       }
 
