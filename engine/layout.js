@@ -1369,21 +1369,29 @@ export class LayoutNode extends Node {
 
     // should this be blocking? - yes?
     if (this.tagName === 'link' && this.attrs.rel === 'stylesheet') {
-      const text = await (await this.document.page.fetch(this.attrs.href)).text();
-      this.rules = new CSSParser().parse(text);
+      try {
+        const text = await (await this.document.page.fetch(this.attrs.href)).text();
+        this.rules = new CSSParser().parse(text);
 
-      this.document.cssRules = this.document.cssRules.concat(this.rules);
-      this.document.invalidateCaches();
+        this.document.cssRules = this.document.cssRules.concat(this.rules);
+        this.document.invalidateCaches();
+      } catch (e) {
+        console.warn('failed to load external stylesheet', this.attrs.href, e);
+      }
     }
 
     if (this.tagName === 'script') {
-      if (this.attrs.src) {
-        const text = await (await this.document.page.fetch(this.attrs.src)).text();
-        await window._js.run(this.document, text);
-      }
+      try {
+        if (this.attrs.src) {
+          const text = await (await this.document.page.fetch(this.attrs.src)).text();
+          await window._js.run(this.document, text);
+        }
 
-      const content = this.children[0]?.content;
-      if (content) await window._js.run(this.document, content);
+        const content = this.children[0]?.content;
+        if (content) await window._js.run(this.document, content);
+      } catch (e) {
+        console.warn('failed to load <script>', this.attrs.src, e);
+      }
     }
 
     if (this.tagName === 'iframe') {
