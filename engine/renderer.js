@@ -96,7 +96,7 @@ export class Renderer {
     const frameTimeStart = performance.now();
     const deltaTime = frameTimeStart - lastFrame;
 
-    this.ctx.fillStyle = this.layout.root.colorAbs('Canvas');
+    this.ctx.fillStyle = this.layout.root.backgroundColor();
     this.ctx.fillRect(0, scrollY, cWidth, scrollY + cHeight);
 
     hoverLink = null;
