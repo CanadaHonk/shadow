@@ -10,7 +10,7 @@ window._js = JS;
 if (window.crossOriginIsolated === false) {
   console.log('not cross-origin isolated, registering service worker');
   const worker = await navigator.serviceWorker.register('sw.js');
-  // if (worker.active.state === 'activated') location.reload();
+  if (worker.active.state === 'activated') location.reload();
 }
 
 window.version = `2023.10.31 🎃`;
