@@ -209,7 +209,9 @@ export class HTMLParser {
 
             this.escaping = false;
 
-            if (this.parent.tagName === 'script' || this.parent.tagName === 'style') {
+            if (this.parent.tagName === 'script' || this.parent.tagName === 'style'
+              || this.parent.tagName === 'svg' // hack!
+            ) {
               const start = i + 1;
               const endTag = '</' + this.parent.tagName + '>';
               const end = input.indexOf(endTag, start);
