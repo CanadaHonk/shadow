@@ -336,6 +336,9 @@ function makeWindowTimer(target, sleep) {
   };
 }
 
+// hack: unspec queueMicrotask(f) = setTimeout(f, 0)
+globalThis.queueMicrotask = f => setTimeout(f, 0);
+
 if (globalThis.setTimeout) {
   ipc.send({ type: 'ready' });
 
