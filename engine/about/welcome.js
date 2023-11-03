@@ -48,7 +48,7 @@ export default () => `<title>Shadow</title>
 <p>here's a twist: <u>you're using it right now</u>! you can use the fps counter in the top right as an indicator.</p>
 <p>here are some debug keybinds for you:</p>
 <ul>
-<li><b>Z</b>: hold for inspect mode (hover over stuff)</li>
+<li><b>Z</b>: toggle inspect mode (hover over stuff)</li>
 <li><b>V</b>: prompt to load url</li>
 <li><b>R</b>: reload the current page</li>
 <li><b>H</b>: go back to welcome page (here)</li>

@@ -399,13 +399,16 @@ document.onmouseup = e => {
 };
 
 document.onkeydown = e => {
-  const k = e.key.toLowerCase();
-  if (k === 'z') debug = e.shiftKey ? 2 : 1;
+  // const k = e.key.toLowerCase();
 };
 
 document.onkeyup = async e => {
   const k = e.key.toLowerCase();
-  if (k === 'z') debug = 0;
+  if (k === 'z') {
+    if (debug) debug = 0;
+      else debug = e.shiftKey ? 2 : 1;
+  }
+
   if (k === 'x') {
     window.colorScheme = window.colorScheme === 'light' ? 'dark' : 'light';
     window._renderer?.layout?.invalidateCaches?.();
