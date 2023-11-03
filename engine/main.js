@@ -91,10 +91,10 @@ const _load = async (url, baseUrl = null, push = true) => {
 
   renderer.layout = mock; */
 
-  let realURL = url;
+  let realURL = url, html;
   if (url.startsWith('about:')) {
     const page = url.slice('about:'.length).split('?')[0];
-    const html = AboutPages[page] ? AboutPages[page]({ url }) : `<span>about: page not found</span>`;
+    html = AboutPages[page] ? AboutPages[page]({ url }) : `<span>about: page not found</span>`;
     realURL = 'data:text/html,' + encodeURIComponent(html);
     push = false;
   }
@@ -114,20 +114,22 @@ const _load = async (url, baseUrl = null, push = true) => {
   if (baseUrl) page.baseURL = baseUrl;
   profileStep('new page');
 
-  const res = await page.fetch(realURL);
-  profileStep('fetch');
+  if (!html) {
+    const res = await page.fetch(realURL);
+    profileStep('fetch');
 
-  let html;
-  switch (res.headers.get('Content-Type').split(';')[0]) {
-    case 'text/javascript':
-    case 'text/css':
-      html = `<meta name="color-scheme" content="dark light"><body><pre>${await res.text()}</pre></body>`;
-      break;
+    switch (res.headers.get('Content-Type').split(';')[0]) {
+      case 'text/javascript':
+      case 'text/css':
+        html = `<meta name="color-scheme" content="dark light"><body><pre>${await res.text()}</pre></body>`;
+        break;
 
-    default:
-      html = await res.text();
-      break;
+      default:
+        html = await res.text();
+        break;
+    }
   }
+
   profileStep('get html');
 
   // console.log(html);
