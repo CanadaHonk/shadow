@@ -359,8 +359,6 @@ globalThis.performance = {
 };
 
 if (globalThis.setTimeout) {
-  ipc.send({ type: 'ready' });
-
   (async () => {
     while (true) {
       const reply = await ipc.sendAsync({ type: 'wait' }, false);

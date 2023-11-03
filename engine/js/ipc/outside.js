@@ -207,11 +207,6 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
 
       backend.send({ type: 'eval', js: backend.queue.pop() });
     });
-
-    await new Promise(res => backend.on('ready', () => {
-      backend.send({});
-      res();
-    }));
   }
 
   const js = _js.slice().trim();
