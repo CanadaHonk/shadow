@@ -47,6 +47,31 @@ const start = async () => {
       }
 
       return reply;
+    },
+
+    sendAsync: msg => {
+      // console.log('worker send', msg);
+      Atomics.store(lengthTyped, 0, 0);
+
+      // self.postMessage(JSON.parse(JSON.stringify(msg)));
+      self.postMessage(msg);
+
+      return new Promise(async res => {
+        await Atomics.waitAsync(lengthTyped, 0, 0, Infinity).value; // wait until typed[0] != 0
+        const length = Atomics.load(lengthTyped, 0);
+
+        for (let i = 0; i < length; i++) {
+          decodeBuffer[i] = Atomics.load(valueTyped, i);
+        }
+
+        const reply = JSON.parse(decoder.decode(decodeBuffer.slice(0, length)));
+
+        if (reply.type === 'eval') {
+          evalQueue.push(reply);
+        }
+
+        res(reply);
+      });
     }
   };
 

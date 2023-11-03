@@ -361,22 +361,20 @@ globalThis.performance = {
 if (globalThis.setTimeout) {
   ipc.send({ type: 'ready' });
 
-  setInterval(() => {
-    ipc.send({ type: 'wait' }, false);
+  (async () => {
+    while (true) {
+      const reply = await ipc.sendAsync({ type: 'wait' }, false);
+      let ret;
+      try {
+        ret = (0, eval)(reply.js);
+      } catch (e) {
+        console.warn('js eval error', e);
+        ret = e;
+      }
 
-    if (evalQueue.length === 0) return;
-
-    let ret;
-    try {
-      ret = (0, eval)(evalQueue.pop().js);
-    } catch (e) {
-      console.warn('js eval error', e);
-      ret = e;
+      ipc.send({ type: 'done' });
     }
-
-    ipc.send({ type: 'done' });
-    // ipc.send({ type: 'done', ret });
-  }, 100);
+  })();
 } else {
   let timerLoop = makeWindowTimer(globalThis, sleep);
 

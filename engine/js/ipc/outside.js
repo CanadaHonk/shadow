@@ -152,6 +152,7 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
 
     backend = {
       name: backendName,
+      queue: [],
       handlers: {}
     };
 
@@ -200,6 +201,13 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
 
     backend.on = (type, handler) => backend.handlers[type] = handler;
 
+    backend.on('wait', async () => {
+      if (backend.queue.length === 0) await new Promise(res => backend.queuePromiseRes = res);
+      backend.queuePromiseRes = null;
+
+      backend.send({ type: 'eval', js: backend.queue.pop() });
+    });
+
     await new Promise(res => backend.on('ready', () => {
       backend.send({});
       res();
@@ -207,13 +215,9 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
   }
 
   const js = _js.slice().trim();
-  // console.log({ js });
+  backend.queue.push(js);
 
-  backend.on('wait', () => {
-    backend.send({ type: 'eval', js });
-
-    backend.handlers.wait = null;
-  });
+  if (backend.queuePromiseRes) backend.queuePromiseRes();
 
   backend.on('done', () => {
     backend.send({});
