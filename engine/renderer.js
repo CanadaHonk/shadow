@@ -431,6 +431,19 @@ document.onkeyup = async e => {
     window.reload();
   }
   if (k === 'r') window.reload();
+  if (k === 'p') {
+    let url = _location.realURL;
+    let openURL = url;
+
+    if (url.startsWith('data:')) openURL = '';
+
+    let win = window.open(openURL, '_blank');
+
+    if (url.startsWith('data:')) {
+      const data = await (await fetch(url)).text();
+      win.document.write(data);
+    }
+  }
 };
 
 document.onwheel = e => {

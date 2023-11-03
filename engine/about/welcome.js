@@ -51,6 +51,7 @@ export default () => `<title>Shadow</title>
 <li><b>V</b>: prompt to load url</li>
 <li><b>R</b>: reload the current page</li>
 <li><b>H</b>: go back to welcome page (here)</li>
+<li><b>P</b>: open current page in real browser</li>
 <li><b>X</b>: switch preferred color scheme (light/dark)</li>
 <li><b>C</b>: dump parsed html</li>
 <li><b>J</b>: cycle JS engine (host -> none -> SpiderMonkey -> Kiesel) (reloads the page)</li>
