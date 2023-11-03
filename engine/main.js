@@ -31,20 +31,65 @@ window.onpopstate = ({ state }) => {
 
 window.reload = () => load(...lastLoad);
 
+window.profile = {};
+window.profileSubsteps = {};
+window.profileStart = () => {
+  const start = performance.now();
+  profile = { start };
+  profileSubsteps = {};
+
+  profile.last = start;
+};
+
+window.profileStep = name => {
+  const now = performance.now();
+  const time = now - profile.last;
+
+  profile.last = now;
+  profile[name] = time;
+  if (profile.lastSub) {
+    for (const x in profileSubsteps) {
+      profile['  ' + x] = profileSubsteps[x];
+    }
+
+    profileSubsteps = {};
+    delete profile.lastSub;
+  }
+};
+
+window.profileSubstep = name => {
+  const now = performance.now();
+  const time = now - (profile.lastSub ?? profile.last);
+
+  profile.lastSub = now;
+  profileSubsteps[name] = time;
+};
+
+window.profileStop = () => {
+  const start = profile.start;
+  profile.total = performance.now() - start;
+
+  delete profile.last;
+  delete profile.lastSub;
+  // delete profile.start;
+};
+
 let renderer, initialLoad = true, lastLoad;
 const _load = async (url, baseUrl = null, push = true) => {
+  profileStart();
+
   if (!renderer) renderer = new Renderer();
+  profileStep('setup renderer');
 
   // wipe current page
   _js.stopAll();
+  profileStep('stop js');
 
   /* const mock = new LayoutNode({}, renderer);
   mock.document = { cssRules: [] };
   mock.root = mock;
 
   renderer.layout = mock; */
-
-  console.log(url);
 
   let realURL = url;
   if (url.startsWith('about:')) {
@@ -56,14 +101,21 @@ const _load = async (url, baseUrl = null, push = true) => {
 
   if (realURL.startsWith('data:')) baseUrl = new URL('/', location.href);
 
+  profileStep('url handling');
+
   window._location = { url, realURL, baseUrl };
 
   history[push && !initialLoad ? 'pushState' : 'replaceState']({ url, baseUrl: baseUrl?.toString?.() }, '', '?' + (baseUrl ? '' : url));
+  profileStep('history api');
+
+  window.beganLoad = Date.now();
 
   const page = new Page(realURL);
   if (baseUrl) page.baseURL = baseUrl;
+  profileStep('new page');
 
   const res = await page.fetch(realURL);
+  profileStep('fetch');
 
   let html;
   switch (res.headers.get('Content-Type').split(';')[0]) {
@@ -76,14 +128,16 @@ const _load = async (url, baseUrl = null, push = true) => {
       html = await res.text();
       break;
   }
+  profileStep('get html');
 
-  console.log(html);
+  // console.log(html);
 
   const parser = new HTMLParser();
   const doc = parser.parse(html);
   window._doc = doc;
+  profileStep('parse html');
 
-  console.log(doc);
+  // console.log(doc);
 
   doc.page = page;
 
@@ -100,7 +154,11 @@ const _load = async (url, baseUrl = null, push = true) => {
 
   favicon_setter.href = page.resolve('/favicon.ico');
 
+  profileStep('use metadata');
+
   initialLoad = false;
+
+  profileStop();
 };
 
 const load = (...args) => {

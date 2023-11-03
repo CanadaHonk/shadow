@@ -3,7 +3,7 @@ const fpsAcc = 1;
 let lastFrame = performance.now();
 let frame = 0;
 
-let debug = false;
+let debug = 0;
 let hoverEl, hoverLink;
 
 window.scrollY = 0;
@@ -87,6 +87,7 @@ export class Renderer {
     };
   }
 
+  lastRootPtr = 0;
   update() {
     if (!this.layout) {
       requestAnimationFrame(this.update);
@@ -235,6 +236,10 @@ export class Renderer {
     if (inspects.length > 0) inspects.pop()();
     if (hoverLink) this.infoBox(hoverLink.href, 0, scrollY + cHeight);
 
+    cursor ??= hoverText ? 'text' : 'default';
+
+    this.canvas.style.cursor = cursor;
+
     fpsFrameCount++;
     if (performance.now() > fpsLastUpdate + 1000 / fpsAcc) {
       fps = fpsFrameCount * fpsAcc;
@@ -242,9 +247,12 @@ export class Renderer {
       fpsFrameCount = 0;
     }
 
-    cursor ??= hoverText ? 'text' : 'default';
-
-    this.canvas.style.cursor = cursor;
+    if (this.layout.root.ptr !== this.lastRootPtr) {
+      this.lastRootPtr = this.layout.root.ptr;
+      if (profile) {
+        profile['first frame'] = performance.now() - frameTimeStart;
+      }
+    }
 
     if (debug || true) {
       this.ctx.fillStyle = this.layout.colorAbs('CanvasText');
@@ -252,6 +260,27 @@ export class Renderer {
       this.ctx.textBaseline = 'top';
       const str = `${fps}fps`;
       this.ctx.fillText(str, cWidth - this.ctx.measureText(str).width - 12, scrollY + 12);
+    }
+
+    if (debug === 2) {
+      const text = `load profile:\n ` + Object.keys(profile).reduce((acc, x) => {
+        if (x === 'start') return acc;
+
+        return acc + `${x}: ${profile[x].toFixed(2)}ms\n ${x === 'total' ? '\n ' : ''}`;
+      }, '');
+
+      const width = 200;
+      const height = 350;
+
+      const x = cWidth - width - 8;
+      const y = scrollY + 32;
+      const padding = 4;
+
+      this.ctx.fillStyle = 'rgba(20, 24, 28, 0.5)';
+      this.ctx.fillRect(x, y, width, height);
+
+      this.ctx.fillStyle = '#f0f4f8';
+      this.fillWrapText('normal normal 14px sans-serif', text, width - padding * 2, x + padding, y + padding);
     }
 
     frame++;
@@ -326,7 +355,6 @@ export class Renderer {
     this.ctx.font = font;
 
     const lines = this.wrapText(font, text, width);
-
     for (const l of lines) {
       this.ctx.fillText(l, x, y);
 
@@ -372,12 +400,12 @@ document.onmouseup = e => {
 
 document.onkeydown = e => {
   const k = e.key.toLowerCase();
-  if (k === 'z') debug = true;
+  if (k === 'z') debug = e.shiftKey ? 2 : 1;
 };
 
-document.onkeyup = e => {
+document.onkeyup = async e => {
   const k = e.key.toLowerCase();
-  if (k === 'z') debug = false;
+  if (k === 'z') debug = 0;
   if (k === 'x') {
     window.colorScheme = window.colorScheme === 'light' ? 'dark' : 'light';
     window._renderer?.layout?.invalidateCaches?.();

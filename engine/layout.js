@@ -1389,13 +1389,16 @@ export class LayoutNode extends Node {
 
   async process() {
     if (this.tagName === 'style') {
+      const t = performance.now();
       this.rules = new CSSParser().parse(this.children[0].content);
       this.document.cssRules = this.document.cssRules.concat(this.rules);
       this.document.invalidateCaches();
+      processTime.style += performance.now() - t;
     }
 
     // should this be blocking? - yes?
     if (this.tagName === 'link' && this.attrs.rel === 'stylesheet') {
+      const t = performance.now();
       try {
         const text = await (await this.document.page.fetch(this.attrs.href)).text();
         this.rules = new CSSParser().parse(text);
@@ -1405,9 +1408,11 @@ export class LayoutNode extends Node {
       } catch (e) {
         console.warn('failed to load external stylesheet', this.attrs.href, e);
       }
+      processTime.link_stylesheet += performance.now() - t;
     }
 
     if (this.tagName === 'script') {
+      const t = performance.now();
       try {
         if (this.attrs.src) {
           const text = await (await this.document.page.fetch(this.attrs.src)).text();
@@ -1419,6 +1424,7 @@ export class LayoutNode extends Node {
       } catch (e) {
         console.warn('failed to load <script>', this.attrs.src, e);
       }
+      processTime.script += performance.now() - t;
     }
 
     if (this.tagName === 'iframe') {
@@ -1451,6 +1457,8 @@ export class LayoutNode extends Node {
   }
 }
 
+let processTime;
+
 const removeDeadTextNodes = x => {
   // if (x.tagName === '#text' && x.displayContent() === '') {
   // if (x.tagName === '#text' && x.parent.tagName === 'body') console.log(x.content, x.content.trim() === '');
@@ -1480,6 +1488,7 @@ export const constructLayout = async (document, renderer) => {
 
   const doc = assembleLayoutNodes(document);
   doc.root = doc.querySelector('html');
+  profileSubstep('assemble');
 
   const reSetDoc = x => {
     x.document = doc;
@@ -1487,10 +1496,27 @@ export const constructLayout = async (document, renderer) => {
     for (const y of x.children) reSetDoc(y);
   };
   reSetDoc(doc);
+  profileSubstep('reset doc');
 
   removeDeadTextNodes(doc);
+  profileSubstep('rm dead text');
+
+  profileStep('construct layout');
+
+  processTime = {
+    style: 0,
+    link_stylesheet: 0,
+    script: 0
+  };
 
   await doc.process();
+
+  for (const x in processTime) {
+    profileSubsteps[x.replaceAll('_', ' ')] = processTime[x];
+  }
+  profile.lastSub = true;
+
+  profileStep('process layout');
 
   // go to top of page
   scrollY = 0;
