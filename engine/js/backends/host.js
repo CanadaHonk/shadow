@@ -1,3 +1,5 @@
+import '../../polys.js';
+
 const decoder = new TextDecoder('utf8');
 
 const SERIAL_RES_SIZE = 1024 * 1024 * 10;
@@ -40,7 +42,8 @@ const start = async () => {
         decodeBuffer[i] = Atomics.load(valueTyped, i);
       }
 
-      const reply = JSON.parse(decoder.decode(decodeBuffer.slice(0, length)));
+      const str = decoder.decode(decodeBuffer.slice(0, length));
+      const reply = JSON.parse(str);
 
       if (reply.type === 'eval') {
         evalQueue.push(reply);
