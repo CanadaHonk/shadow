@@ -1103,7 +1103,9 @@ export class LayoutNode extends Node {
   marginRight() {
     const val = this.css()['margin-right'];
 
-    if (val === 'auto') return 0; // todo: actually auto
+    if (this.isBlock() && val === 'auto') {
+      return (this.parent.width() - this.width()) / 2;
+    }
 
     return this.lengthAbs(val, 'margin-right');
   }
