@@ -458,7 +458,7 @@ document.onwheel = e => {
   window._renderer.ctx.translate(0, -scrollY);
 };
 
-window.onresize = () => {
+window.onresize = x => {
   cWidth = window.innerWidth;
   cHeight = window.innerHeight;
 
@@ -470,5 +470,5 @@ window.onresize = () => {
   window._renderer.ctx.setTransform(renderScale, 0, 0, renderScale, 0, 0);
   window._renderer.ctx.translate(0, -scrollY);
 
-  window._renderer.layout?.invalidateCaches?.();
+  if (x !== 'ignore_last') window._renderer.layout?.invalidateCaches?.();
 };
