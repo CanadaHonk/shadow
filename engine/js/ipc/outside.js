@@ -91,6 +91,10 @@ const funcs = {
   'alert': ({ msg }, send) => {
     alert(msg);
     send({});
+  },
+
+  'getBeganLoad': ({ }, send) => {
+    send({ value: window.beganLoad });
   }
 };
 
@@ -132,6 +136,7 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
   if (backendName === null || !_js) return resolve(null);
 
   if (window.crossOriginIsolated === false) {
+    console.warn('not cross-origin isolated, giving up running');
     // alert(`due to browser restrictions, shadow has to use a service worker and reload once to be able to use some JS features which it requires for running JS (SharedArrayBuffer). try reloading`);
     return resolve(null);
   }

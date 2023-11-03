@@ -339,6 +339,26 @@ function makeWindowTimer(target, sleep) {
 // hack: unspec queueMicrotask(f) = setTimeout(f, 0)
 globalThis.queueMicrotask = f => setTimeout(f, 0);
 
+const _performance = globalThis.performance;
+globalThis.performance = {
+  now() {
+    let base;
+    if (_performance) {
+      base = _performance.now() + (_performance.timeOrigin || 0);
+    } else {
+      base = Date.now();
+    }
+
+    return base - this.timeOrigin;
+  },
+
+  get timeOrigin() {
+    delete this.timeOrigin;
+    return this.timeOrigin = ipc.send({ f: 'getBeganLoad' }).value;
+  }
+};
+console.log(globalThis.performance);
+
 if (globalThis.setTimeout) {
   ipc.send({ type: 'ready' });
 
@@ -351,6 +371,7 @@ if (globalThis.setTimeout) {
     try {
       ret = (0, eval)(evalQueue.pop().js);
     } catch (e) {
+      console.warn('js eval error', e);
       ret = e;
     }
 
@@ -368,10 +389,6 @@ if (globalThis.setTimeout) {
     ipc.send({ type: 'wait' }, false);
 
     if (evalQueue.length === 0) continue;
-
-    // while (evalQueue.length === 0) console.log('while no eval queue') || ipc.recv(false);
-
-    // console.log('evaling');
 
     let ret;
     try {
