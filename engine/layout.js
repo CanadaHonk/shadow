@@ -1290,7 +1290,7 @@ export class LayoutNode extends Node {
     }
 
     const parser = new HTMLParser();
-    const dom = parser.parse(value, this._innerHTMLHTMLTag);
+    const dom = parser.parse(value, this._innerHTMLHTMLTag ?? false);
     this._innerHTMLHTMLTag = false;
 
     const process = x => {
