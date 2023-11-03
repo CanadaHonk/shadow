@@ -747,9 +747,9 @@ export class LayoutNode extends Node {
     }
 
     if (true) {
-      let maxY;
+      let maxY = 0;
       if (this.children.length > 0) {
-        let target = this.children[this.children.length - 1];
+        /* let target = this.children[this.children.length - 1];
         while (target.css().display === 'none') {
           target = target.siblingBefore;
         }
@@ -761,6 +761,19 @@ export class LayoutNode extends Node {
           } else {
             maxY += target.height();
           }
+        } */
+
+        for (const x of this.children) {
+          let y = x.endY();
+          if (!x.isBlock()) {
+            if (x.tagName === '#text') {
+              y += x.lineHeight();
+            } else {
+              y += x.height();
+            }
+          }
+
+          maxY = Math.max(y, maxY);
         }
       } else {
         maxY = this.y();
