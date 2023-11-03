@@ -1464,16 +1464,23 @@ let processTime;
 const removeDeadTextNodes = x => {
   // if (x.tagName === '#text' && x.displayContent() === '') {
   // if (x.tagName === '#text' && x.parent.tagName === 'body') console.log(x.content, x.content.trim() === '');
-  if (x.tagName === '#text' && x.content.trim() === '') {
-    if (x.content.length > 0 && x.siblingAfter && x.siblingBefore?.isInline?.() && x.siblingAfter.isInline()) {
-      const t = x.siblingAfter.textNode();
-      if (t && !t.content.startsWith(' ')) t.content = ' ' + t.content;
+
+  x.children = x.children.filter(y => {
+    if (y.tagName === '#text') {
+      if (y.content.trim() === '') {
+        if (y.content.length > 0 && y.siblingAfter && y.siblingBefore?.isInline?.() && y.siblingAfter.isInline()) {
+          const t = y.siblingAfter.textNode();
+          if (t && !t.content.startsWith(' ')) t.content = ' ' + t.content;
+        }
+
+        return false;
+      }
+    } else {
+      removeDeadTextNodes(y);
     }
 
-    x.remove();
-  }
-
-  for (const y of x.children.slice()) removeDeadTextNodes(y);
+    return true;
+  });
 };
 
 export const constructLayout = async (document, renderer) => {
