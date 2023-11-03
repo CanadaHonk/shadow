@@ -56,6 +56,9 @@ export default () => `<title>Shadow</title>
 <li><b>C</b>: dump parsed html</li>
 <li><b>J</b>: cycle JS engine (host -> none -> SpiderMonkey -> Kiesel) (reloads the page)</li>
 </ul>
+
+<div>this page loaded in: <span id="loadtime"></span></div>
+
 <h2>demo sites</h2>
 <ul>${demos.map(x => `<li><a href="${x[0]}">${x[0]}</a> (${x[1]})</li>`).join('\n')}</ul>
 
@@ -119,4 +122,7 @@ noscript {
   font-size: 0.8em;
 }
 </style>
+<script>
+document.querySelector('#loadtime').innerHTML = performance.now().toFixed(0) + 'ms';
+</script>
 </body>`;
