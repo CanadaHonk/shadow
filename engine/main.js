@@ -142,7 +142,7 @@ const _load = async (url, baseUrl = null, push = true) => {
   doc.page = page;
 
   const layout = await constructLayout(doc, renderer);
-  console.log(layout);
+  // console.log(layout);
 
   const title = layout.querySelector('title');
 

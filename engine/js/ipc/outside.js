@@ -122,7 +122,7 @@ export const stopAll = () => {
 export const stop = doc => {
   let backend = instances[doc.ptr];
 
-  console.log('stop backend', doc.ptr);
+  console.log('stop JS backend', doc.ptr);
 
   if (backend) {
     backend.worker.onmessage = () => {};
@@ -136,7 +136,7 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
   if (backendName === null || !_js) return resolve(null);
 
   if (window.crossOriginIsolated === false) {
-    console.warn('not cross-origin isolated, giving up running');
+    console.warn('not cross-origin isolated, giving up running JS');
     // alert(`due to browser restrictions, shadow has to use a service worker and reload once to be able to use some JS features which it requires for running JS (SharedArrayBuffer). try reloading`);
     return resolve(null);
   }
@@ -144,7 +144,7 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
   let backend = instances[doc.ptr];
 
   if (!backend || backend.name !== backendName) {
-    console.log('new backend', doc.ptr, backendName, Object.keys(instances).length);
+    console.log('new JS backend', doc.ptr, backendName, Object.keys(instances).length);
     if (backend) {
       backend.worker.onmessage = () => {};
       backend.worker.terminate();

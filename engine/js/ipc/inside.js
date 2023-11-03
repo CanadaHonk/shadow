@@ -357,7 +357,6 @@ globalThis.performance = {
     return this.timeOrigin = ipc.send({ f: 'getBeganLoad' }).value;
   }
 };
-console.log(globalThis.performance);
 
 if (globalThis.setTimeout) {
   ipc.send({ type: 'ready' });
