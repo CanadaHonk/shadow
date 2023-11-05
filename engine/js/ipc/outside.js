@@ -1,13 +1,14 @@
 const funcs = {
-  // todo: error/not found handling
-  'document.querySelector': ({ selector }, send, doc) => {
-    const el = doc.querySelector(selector);
-    send({ ptr: el?.ptr });
+  'Element.querySelector': ({ selector, ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    const target = el.querySelector(selector);
+    send({ ptr: target?.ptr });
   },
 
-  'document.getElementById': ({ id }, send, doc) => {
-    const el = doc.allChildren().find(x => x.id === id);
-    send({ ptr: el?.ptr });
+  'Element.getElementById': ({ id, ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    const target = el.allChildren().find(x => x.id === id);
+    send({ ptr: target?.ptr });
   },
 
   'Element.getClassName': ({ ptr }, send, doc) => {
@@ -49,6 +50,13 @@ const funcs = {
     send({ ptr: el.contentDocument.ptr });
   },
 
+  'Element.appendChild': ({ value, ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    const valueEl = doc.getFromPtr(value);
+    el.appendChild(valueEl);
+    send({});
+  },
+
   // todo: ensure document only, return values?
   'Document.open': ({ ptr }, send, doc) => {
     const el = doc.getFromPtr(ptr);
@@ -66,6 +74,22 @@ const funcs = {
     const el = doc.getFromPtr(ptr);
     el.close();
     send({});
+  },
+
+  'Document.createElement': ({ value, ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    const newEl = el.createElement(value);
+    send({ ptr: newEl?.ptr });
+  },
+
+  'Document.createTextNode': ({ value, ptr }, send, doc) => {
+    const el = doc.getFromPtr(ptr);
+    const newEl = el.createTextNode(value);
+    send({ ptr: newEl?.ptr });
+  },
+
+  'Document.ptr': ({}, send, doc) => {
+    send({ ptr: doc.ptr });
   },
 
   'parent': async ({ prop, args }, send, doc) => {

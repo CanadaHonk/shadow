@@ -69,6 +69,18 @@ class Element {
     return new Element(ipc.send({ f: 'Element.getContentDocument', ptr: this.ptr }));
   }
 
+  appendChild(value) {
+    ipc.send({ f: 'Element.appendChild', value: value.ptr, ptr: this.ptr });
+  }
+
+  querySelector(selector) {
+    return makeEl(ipc.send({ f: 'Element.querySelector', selector, ptr: this.ptr }));
+  }
+
+  getElementById(id) {
+    return makeEl(ipc.send({ f: 'Element.getElementById', id, ptr: this.ptr }));
+  }
+
   // todo: ensure document only, return values?
   open() {
     ipc.send({ f: 'Document.open', ptr: this.ptr });
@@ -81,6 +93,14 @@ class Element {
   close() {
     ipc.send({ f: 'Document.close', ptr: this.ptr });
   }
+
+  createElement(value) {
+    return makeEl(ipc.send({ f: 'Document.createElement', value, ptr: this.ptr }));
+  }
+
+  createTextNode(value) {
+    return makeEl(ipc.send({ f: 'Document.createTextNode', value, ptr: this.ptr }));
+  }
 }
 
 const makeEl = data => {
@@ -88,15 +108,7 @@ const makeEl = data => {
   return new Element(data);
 };
 
-globalThis.document = {
-  querySelector(selector) {
-    return makeEl(ipc.send({ f: 'document.querySelector', selector }));
-  },
-
-  getElementById(id) {
-    return makeEl(ipc.send({ f: 'document.getElementById', id }));
-  }
-};
+globalThis.document = makeEl(ipc.send({ f: 'Document.ptr' }));
 
 globalThis.alert = msg => {
   ipc.send({ f: 'alert', msg });
