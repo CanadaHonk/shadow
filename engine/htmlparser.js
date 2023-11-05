@@ -253,7 +253,7 @@ export class HTMLParser {
           i++;
           // uhm this is less spec compliant than trident
           // just skip the closing tag (!!! wtf !!!)
-          while (input[++i] != '>') closingName += input[i];
+          while (input[++i] != '>') closingName += input[i].toLowerCase();
 
           // self close last node if we should. jank?
           const selfCloseRuleLast = SELF_CLOSING_RULES[this.parent?.tagName];
