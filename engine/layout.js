@@ -728,8 +728,12 @@ export class LayoutNode extends Node {
     }
 
     if (this.isBlock()) {
+      let space = this.horizontalSpace();
+      if (this.css()['margin-left'] !== 'auto') space += this.marginLeft();
+      if (this.css()['margin-right'] !== 'auto') space += this.marginRight();
+
       // take up as much as we can?
-      return (this.parent ?? this.frame).contentWidth() - this.horizontalSpace(true);
+      return (this.parent ?? this.frame).contentWidth() - space;
     }
 
     let width = 0;
@@ -1091,11 +1095,12 @@ export class LayoutNode extends Node {
   marginBottom() {
     return this.lengthAbs(this.css()['margin-bottom'], 'margin-bottom');
   }
+
   marginLeft() {
     const val = this.css()['margin-left'];
 
     if (this.isBlock() && val === 'auto') {
-      return (this.parent.width() - this.width()) / 2;
+      return (this.parent.width() - (this.contentWidth() + this.paddingLeft() + this.paddingRight())) / 2;
     }
 
     return this.lengthAbs(val, 'margin-left');
@@ -1104,7 +1109,7 @@ export class LayoutNode extends Node {
     const val = this.css()['margin-right'];
 
     if (this.isBlock() && val === 'auto') {
-      return (this.parent.width() - this.width()) / 2;
+      return (this.parent.width() - (this.contentWidth() + this.paddingLeft() + this.paddingRight())) / 2;
     }
 
     return this.lengthAbs(val, 'margin-right');
