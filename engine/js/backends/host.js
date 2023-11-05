@@ -5,7 +5,7 @@ const decoder = new TextDecoder('utf8');
 const SERIAL_RES_SIZE = 1024 * 1024 * 10;
 const decodeBuffer = new Uint8Array(SERIAL_RES_SIZE);
 
-let lengthBuffer, lengthTyped, valueBuffer, valueTyped;
+let lengthBuffer, lengthTyped, valueBuffer, valueTyped, js;
 
 let gotBuffersPromise = new Promise(res => {
   self.addEventListener('message', e => {
@@ -17,14 +17,14 @@ let gotBuffersPromise = new Promise(res => {
       valueBuffer = e.data.valueBuffer;
       valueTyped = new Uint8Array(valueBuffer);
 
+      js = e.data.js;
+
       res();
     }
   });
 });
 
 const start = async () => {
-  const js = await (await fetch('/engine/js/ipc/inside.js')).text();
-
   globalThis.evalQueue = [];
   globalThis.ipc = {
     send: msg => {

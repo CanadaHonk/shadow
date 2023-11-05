@@ -93,7 +93,7 @@ const funcs = {
     send({});
   },
 
-  'getBeganLoad': ({ }, send) => {
+  'getBeganLoad': ({}, send) => {
     send({ value: window.beganLoad });
   }
 };
@@ -132,6 +132,8 @@ export const stop = doc => {
   delete instances[doc.ptr];
 };
 
+const worldJS = await (await fetch('/engine/js/ipc/inside.js')).text();
+
 export const run = (backendName, doc, _js) => new Promise(async resolve => {
   if (backendName === null || !_js) return resolve(null);
 
@@ -169,7 +171,7 @@ export const run = (backendName, doc, _js) => new Promise(async resolve => {
 
     const encoder = new TextEncoder('utf8');
 
-    backend.worker.postMessage({ lengthBuffer, valueBuffer });
+    backend.worker.postMessage({ lengthBuffer, valueBuffer, js: worldJS });
 
     backend.worker.onmessage = e => {
       const msg = e.data;
