@@ -113,8 +113,11 @@ export const stopAll = () => {
     if (x.worker) {
       x.worker.onmessage = () => {};
       x.worker.terminate();
+      x.worker = null;
+      delete x.worker;
     }
 
+    instances[x] = null;
     delete instances[x];
   }
 };
@@ -127,8 +130,11 @@ export const stop = doc => {
   if (backend) {
     backend.worker.onmessage = () => {};
     backend.worker.terminate();
+    backend.worker = null;
+    delete backend.worker;
   }
 
+  instances[doc.ptr] = null;
   delete instances[doc.ptr];
 };
 
