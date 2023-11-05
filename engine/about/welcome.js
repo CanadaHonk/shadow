@@ -46,7 +46,7 @@ export default () => `<title>Shadow</title>
 <body>
 <h1>welcome to Shadow <small>v${version}</small></h1>
 <p>Shadow is a ${weeks} week old novel browser engine made (almost) entirely in JS from scratch,<br>only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>
-<p>here's a twist: <u>you're using it right now</u>! you can use the fps counter in the top right as an indicator.</p>
+<p>here's a twist: <u>you're using it right now</u>!</p>
 <p>here are some debug keybinds for you:</p>
 <ul>
 <li><b>Z</b>: toggle inspect mode (hover over stuff)</li>
