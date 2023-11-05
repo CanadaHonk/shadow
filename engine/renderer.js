@@ -120,7 +120,7 @@ export class Renderer {
         // this.ctx.fillRect(x, y, width, height);
         if (lastMousePos[0] >= x && lastMousePos[0] <= (x + width) && (lastMousePos[1] + scrollY) >= y && (lastMousePos[1] + scrollY) <= (y + height)) {
           if (_.tagName !== '#text') {
-            if (debug) inspects.push(() => {
+            if (debug === 1) inspects.push(() => {
               // this.ctx.fillStyle = `rgba(0, ${_.tagName !== '#text' ? 200 : 0}, ${_.tagName === '#text' ? 200 : 0}, 0.2)`;
 
               this.ctx.fillStyle = `rgba(249, 204, 157, 0.5)`;
@@ -283,6 +283,36 @@ export class Renderer {
       this.fillWrapText('normal normal 14px sans-serif', text, width - padding * 2, x + padding, y + padding);
     }
 
+    if (debug === 3) {
+      if (!this.measursingMemory) {
+        this.measuringMemory = true;
+        performance.measureUserAgentSpecificMemory?.()?.then?.(x => {
+          this.measuredMemory = x;
+          this.measuringMemory = false;
+        });
+      }
+
+      let text = 'measuring memory...';
+      if (this.measuredMemory) {
+        const mem = this.measuredMemory.breakdown.filter(x => x.bytes > 0).sort((a, b) => b.bytes - a.bytes);
+        text = `memory usage:\n ` + mem.map(x => `${x.attribution[0]?.scope ?? '?'}/${x.types.join('-')} ${(x.bytes / 1024 / 1000).toFixed(2)}MB`.replace('DedicatedWorkerGlobalScope', 'Worker')).join('\n ');
+        text += `\n total: ${(this.measuredMemory.bytes / 1024 / 1024).toFixed(2)}MB`;
+      }
+
+      const width = 200;
+      const height = 350;
+
+      const x = cWidth - width - 8;
+      const y = scrollY + 32;
+      const padding = 4;
+
+      this.ctx.fillStyle = 'rgba(20, 24, 28, 0.5)';
+      this.ctx.fillRect(x, y, width, height);
+
+      this.ctx.fillStyle = '#f0f4f8';
+      this.fillWrapText('normal normal 14px sans-serif', text, width - padding * 2, x + padding, y + padding);
+    }
+
     frame++;
     lastFrame = performance.now();
 
@@ -405,8 +435,11 @@ document.onkeydown = e => {
 document.onkeyup = async e => {
   const k = e.key.toLowerCase();
   if (k === 'z') {
-    if (debug) debug = 0;
-      else debug = e.shiftKey ? 2 : 1;
+    if (e.shiftKey) {
+      debug = (debug + 1) % 4;
+    } else {
+      debug = (debug + 1) % 2;
+    }
   }
 
   if (k === 'x') {
