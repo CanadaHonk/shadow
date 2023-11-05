@@ -9,7 +9,8 @@ const demos = [
   // [ 'https://www.stroustrup.com', 'usable?' ],
   // [ 'https://cs.sjoy.lol', 'usable?' ],
   [ 'https://example.com', 'almost perfect' ],
-  [ 'https://mozilla.github.io/krakenbenchmark.mozilla.org/', 'older JS benchmark, takes ~1 min for host JS, very long for others' ]
+  [ 'https://mozilla.github.io/krakenbenchmark.mozilla.org/', 'older JS benchmark' ],
+  [ 'http://proofcafe.org/jsx-bench/js/sunspider.html', 'older older JS benchmark' ],
 ];
 
 const supported = [
