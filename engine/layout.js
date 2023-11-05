@@ -659,7 +659,7 @@ export class LayoutNode extends Node {
     const startY = this.y();
 
     const parent = this.availableParent();
-    const baseX = parent.x() + parent.marginLeft() + parent.paddingLeft();
+    const baseX = parent.x() + parent.paddingLeft();
 
     let available = this.availableWidth();
 
