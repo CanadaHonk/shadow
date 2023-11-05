@@ -709,7 +709,7 @@ export class LayoutNode extends Node {
       firstWord = true;
     }
 
-    if (str) {
+    if (str || chunks.length === 0) {
       const measure = this.renderer.measureText(str, font);
       chunks.push({ x, y, str, width: measure.width, height: lineHeight });
     }
