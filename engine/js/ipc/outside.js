@@ -111,7 +111,8 @@ const SERIAL_RES_SIZE = 1024 * 1024 * 10;
 export const stopAll = () => {
   for (const x in instances) {
     if (x.worker) {
-      x.worker.onmessage = () => {};
+      x.worker.onmessage = null;
+      delete x.worker.onmessage;
       x.worker.terminate();
       x.worker = null;
       delete x.worker;
@@ -128,7 +129,8 @@ export const stop = doc => {
   console.log('stop JS backend', doc.ptr);
 
   if (backend) {
-    backend.worker.onmessage = () => {};
+    backend.worker.onmessage = null;
+    delete backend.worker.onmessage;
     backend.worker.terminate();
     backend.worker = null;
     delete backend.worker;
