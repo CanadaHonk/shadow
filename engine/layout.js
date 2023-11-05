@@ -16,7 +16,7 @@ const defaultProperties = {
 
   'text-align': 'left',
 
-  'font-family': '',
+  'font-family': 'normal',
   'font-size': '1em',
   'font-style': 'normal',
   'font-weight': 'normal',
@@ -59,7 +59,10 @@ const propToFunc = x => x.replace(/\-[a-z]/g, _ => _[1].toUpperCase());
 window.colorScheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 
 // uh yeah this is just a constant :)
-const defaultFontSize = 16; // px
+const defaultFontSize = {
+  default: 16,
+  monospace: 13
+}; // px
 
 const byPtr = {};
 export class LayoutNode extends Node {
@@ -94,6 +97,7 @@ export class LayoutNode extends Node {
     cache('lineHeight'); cache('maxWidth');
     cache('availableParent'); cache('availableWidth'); cache('availableTotalWidth');
     cache('textChunks'); cache('endX'); cache('endY');
+    cache('fontSize'); cache('defaultFontSize');
     cache('font');
   }
 
@@ -466,6 +470,11 @@ export class LayoutNode extends Node {
     return !this.isBlock();
   }
 
+  defaultFontSize() {
+    const fontFamily = this.css()['font-family'];
+    return defaultFontSize[fontFamily] ?? defaultFontSize.default;
+  }
+
   // technically <length-percentage> but uhm yeah
   lengthAbs(i, property, parent = this.parent) {
     const x = this.resolveValue(i);
@@ -473,13 +482,13 @@ export class LayoutNode extends Node {
     if (property === 'font-size') {
       // :/
       switch (x) {
-        case 'xx-small': return defaultFontSize * (3/5);
-        case 'x-small': return defaultFontSize * (3/4);
-        case 'small': return defaultFontSize * (8/9);
-        case 'medium': return defaultFontSize * (1);
-        case 'large': return defaultFontSize * (6/5);
-        case 'x-large': return defaultFontSize * (3/2);
-        case 'xx-large': return defaultFontSize * (2/1);
+        case 'xx-small': return this.defaultFontSize() * (3/5);
+        case 'x-small': return this.defaultFontSize() * (3/4);
+        case 'small': return this.defaultFontSize() * (8/9);
+        case 'medium': return this.defaultFontSize() * (1);
+        case 'large': return this.defaultFontSize() * (6/5);
+        case 'x-large': return this.defaultFontSize() * (3/2);
+        case 'xx-large': return this.defaultFontSize() * (2/1);
         case 'xxx-large': return defaultFontSize * (3/1);
 
         // not specified exactly :(
