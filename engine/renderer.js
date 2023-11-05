@@ -254,7 +254,7 @@ export class Renderer {
       }
     }
 
-    if (debug || true) {
+    if (debug) {
       this.ctx.fillStyle = this.layout.colorAbs('CanvasText');
       this.ctx.font = 'normal normal 16px sans-serif';
       this.ctx.textBaseline = 'top';
