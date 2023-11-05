@@ -262,6 +262,74 @@ export class Renderer {
       this.ctx.fillText(str, cWidth - this.ctx.measureText(str).width - 12, scrollY + 12);
     }
 
+    if (debug > 1) {
+      const frameTime = performance.now() - frameTimeStart;
+
+      let graphX = cWidth - 300 - 8;
+      let graphY = scrollY + 32;
+
+      if (!this.ftData) this.ftData = [];
+      if (this.ftData.length > 300) this.ftData.shift();
+      this.ftData.push(frameTime);
+
+      if (!this.dtData) this.dtData = [];
+      if (this.dtData.length > 300) this.dtData.shift();
+      this.dtData.push(deltaTime);
+
+      let ftData = this.ftData;
+      let dtData = this.dtData;
+
+      this.ctx.fillStyle = `rgba(20, 24, 28, 0.5)`;
+      this.ctx.fillRect(graphX, graphY, 300, 160);
+
+      this.ctx.font = '14px monospace';
+      this.ctx.textBaseline = 'top';
+      // this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      this.ctx.fillStyle = '#f0f4f8';
+
+      const ftAvg = ftData.reduce((acc, x) => acc + x, 0) / ftData.length;
+
+      const ftStartY = graphY + (160 - /* (ftData[0] + ftData[1] + ftData[2] + ftData[3] + ftData[4]) / 5 */ ftAvg * 5);
+
+      this.ctx.fillText('t', graphX + 4, ftStartY - 18);
+      this.ctx.fillText('ᶠ', graphX + 4 + 7, ftStartY - 11);
+
+      this.ctx.font = '12px monospace';
+      this.ctx.fillText(`${ftAvg.toFixed(2)}ms`, graphX + 24, ftStartY - 16);
+
+      this.ctx.beginPath();
+
+      this.ctx.lineWidth = 1;
+      this.ctx.strokeStyle = 'rgba(0, 0, 250, 0.8)';
+      this.ctx.moveTo(graphX, ftStartY);
+      for (let i = 0; i < ftData.length; i++) {
+        // ctx.fillStyle = `rgba(0, 0, 0, 1)`;
+        this.ctx.lineTo(graphX + i, graphY + (160 - Math.min(160, ftData[i] * 5)));
+      }
+
+      this.ctx.stroke();
+
+      const dtAvg = dtData.reduce((acc, x) => acc + x, 0) / dtData.length;
+      const dtStartY = graphY + (160 - /* (dtData[0] + dtData[1] + dtData[2] + dtData[3] + dtData[4]) / 5 */ dtAvg * 5);
+
+      this.ctx.font = '14px monospace';
+      this.ctx.fillText('Δt', graphX + 4, dtStartY - 18);
+
+      this.ctx.font = '12px monospace';
+      this.ctx.fillText(`${dtAvg.toFixed(2)}ms`, graphX + 24, dtStartY - 16);
+
+      this.ctx.beginPath();
+      this.ctx.lineWidth = 1;
+      this.ctx.strokeStyle = 'rgba(250, 0, 0, 0.8)';
+      this.ctx.moveTo(graphX, dtStartY);
+      for (let i = 0; i < dtData.length; i++) {
+        // ctx.fillStyle = `rgba(0, 0, 0, 1)`;
+        this.ctx.lineTo(graphX + i, graphY + (160 - Math.min(dtData[i] * 5)));
+      }
+
+      this.ctx.stroke();
+    }
+
     if (debug === 2) {
       const text = `load profile:\n ` + Object.keys(profile).reduce((acc, x) => {
         if (x === 'start') return acc;
@@ -273,7 +341,7 @@ export class Renderer {
       const height = 350;
 
       const x = cWidth - width - 8;
-      const y = scrollY + 32;
+      const y = scrollY + 32 + 160 + 12;
       const padding = 4;
 
       this.ctx.fillStyle = 'rgba(20, 24, 28, 0.5)';
@@ -303,7 +371,7 @@ export class Renderer {
       const height = 350;
 
       const x = cWidth - width - 8;
-      const y = scrollY + 32;
+      const y = scrollY + 32 + 160 + 12;
       const padding = 4;
 
       this.ctx.fillStyle = 'rgba(20, 24, 28, 0.5)';
@@ -436,9 +504,10 @@ document.onkeyup = async e => {
   const k = e.key.toLowerCase();
   if (k === 'z') {
     if (e.shiftKey) {
-      debug = (debug + 1) % 4;
+      debug = Math.max(2, (debug + 1) % 4);
     } else {
-      debug = (debug + 1) % 2;
+      if (debug) debug = 0;
+        else debug = 1;
     }
   }
 
