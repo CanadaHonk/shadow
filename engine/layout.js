@@ -1349,6 +1349,17 @@ export class LayoutNode extends Node {
     this.writing = false;
   }
 
+  createElement(tagName) {
+    const el = new LayoutNode(new Node(tagName, this.document), this.renderer);
+    return el;
+  }
+
+  createTextNode(str) {
+    const el = new LayoutNode(new Node('#text', this.document), this.renderer);
+    el.content = str;
+    return el;
+  }
+
   remove() {
     super.remove();
 
