@@ -108,19 +108,23 @@ export class Renderer {
 
     const inspects = [];
 
+    this.ctx.textBaseline = 'bottom';
     const draw = (_, depth = 0) => {
       if (_.display() === 'none') return;
 
       let x = _.x(), y = _.y(), width = _.width(), height = _.height();
 
+      // only care about y (for now)
+      const isOffscreen = y > (scrollY + cHeight) || (y + height) < scrollY;
+
       // if (_.tagName === 'h1') console.log({ x, y, width, height });
 
-      if (depth >= 0 && !['document'].includes(_.tagName)) {
+      if (!isOffscreen && debug === 1 && _.tagName !== 'document') {
         // this.ctx.fillStyle = `rgba(0, 100, 0, ${(depth + 1) * 0.1})`;
         // this.ctx.fillRect(x, y, width, height);
         if (lastMousePos[0] >= x && lastMousePos[0] <= (x + width) && (lastMousePos[1] + scrollY) >= y && (lastMousePos[1] + scrollY) <= (y + height)) {
           if (_.tagName !== '#text') {
-            if (debug === 1) inspects.push(() => {
+            inspects.push(() => {
               // this.ctx.fillStyle = `rgba(0, ${_.tagName !== '#text' ? 200 : 0}, ${_.tagName === '#text' ? 200 : 0}, 0.2)`;
 
               this.ctx.fillStyle = `rgba(249, 204, 157, 0.5)`;
@@ -161,13 +165,12 @@ export class Renderer {
       }
 
       const bg = _.backgroundColor();
-      if (bg) {
+      if (!isOffscreen && bg) {
         this.ctx.fillStyle = bg;
         this.ctx.fillRect(x, y, width, height);
       }
 
-      if (_.tagName === '#text') {
-        this.ctx.textBaseline = 'bottom';
+      if (!isOffscreen && _.tagName === '#text') {
         this.ctx.fillStyle = _.color();
 
         for (const c of _.textChunks()) {
@@ -200,7 +203,7 @@ export class Renderer {
         }
       }
 
-      if (_.isImage() && _._image) {
+      if (!isOffscreen && _.isImage() && _._image) {
         this.ctx.drawImage(_._image, x, y, width, height);
 
         if (lastMousePos[0] >= x && lastMousePos[0] <= (x + width) && (lastMousePos[1] + scrollY) >= y && (lastMousePos[1] + scrollY) <= (y + height)) {
@@ -237,7 +240,6 @@ export class Renderer {
     if (hoverLink) this.infoBox(hoverLink.href, 0, scrollY + cHeight);
 
     cursor ??= hoverText ? 'text' : 'default';
-
     this.canvas.style.cursor = cursor;
 
     const frameTime = performance.now() - frameTimeStart;
