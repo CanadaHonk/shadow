@@ -354,7 +354,7 @@ export class LayoutNode extends Node {
           let parent = this;
           while (parent) {
             let value = parent.css()[name];
-            if (value) return value;
+            if (value) return this.resolveValue(value);
 
             parent = parent.parent;
           }
