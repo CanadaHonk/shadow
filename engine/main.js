@@ -170,6 +170,7 @@ const load = (...args) => {
 window.load = load;
 
 const omniload = query => {
+  if (query === null) return;
   let url;
   try {
     url = new URL(query);
