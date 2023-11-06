@@ -223,7 +223,7 @@ export class LayoutNode extends Node {
 
   // parse a [ b [ c [ d ]? ]? ]? shorthand (eg margin, padding) into [top, bottom, left, right]
   parse4Shorthand(x) {
-    x = this.resolveValue(x);
+    // x = this.resolveValue(x);
     const spl = x.split(' ').filter(x => x);
 
     switch (spl.length) {
