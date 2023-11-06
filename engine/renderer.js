@@ -324,7 +324,7 @@ export class Renderer {
       this.ctx.moveTo(graphX, dtStartY);
       for (let i = 0; i < dtData.length; i++) {
         // ctx.fillStyle = `rgba(0, 0, 0, 1)`;
-        this.ctx.lineTo(graphX + i, graphY + (160 - Math.min(dtData[i] * 5)));
+        this.ctx.lineTo(graphX + i, graphY + (160 - Math.min(160, dtData[i] * 5)));
       }
 
       this.ctx.stroke();
