@@ -299,6 +299,12 @@ export class LayoutNode extends Node {
               break;
             }
 
+            case 'background': {
+              // just alias for background-color for now
+              props['background-color'] = v;
+              break;
+            }
+
             default:
               props[x] = v;
               break;
