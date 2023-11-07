@@ -284,10 +284,26 @@ export class LayoutNode extends Node {
 
     const checkRule = rule => {
       if (this.matchesCSS(rule.selectors)) {
-        props = {
-          ...props,
-          ...rule.properties
-        };
+        for (const x in rule.properties) {
+          const v = rule.properties[x];
+
+          switch (x) {
+            case 'margin':
+            case 'padding': {
+              const [ top, bottom, left, right ] = this.parse4Shorthand(v);
+
+              props[x + '-top'] = top;
+              props[x + '-bottom'] = bottom;
+              props[x + '-left'] = left;
+              props[x + '-right'] = right;
+              break;
+            }
+
+            default:
+              props[x] = v;
+              break;
+          }
+        }
       }
     };
 
@@ -321,26 +337,6 @@ export class LayoutNode extends Node {
 
     if (this.tagName === 'font') {
       if (this.attrs.color) props.color = this.attrs.color;
-    }
-
-    if (props.margin) {
-      const [ marginTop, marginBottom, marginLeft, marginRight ] = this.parse4Shorthand(props.margin);
-
-      // todo: this does not follow specificity lol
-      props['margin-top'] = marginTop;
-      props['margin-bottom'] = marginBottom;
-      props['margin-left'] = marginLeft;
-      props['margin-right'] = marginRight;
-    }
-
-    if (props.padding) {
-      const [ paddingTop, paddingBottom, paddingLeft, paddingRight ] = this.parse4Shorthand(props.padding);
-
-      // todo: this does not follow specificity lol
-      props['padding-top'] = paddingTop;
-      props['padding-bottom'] = paddingBottom;
-      props['padding-left'] = paddingLeft;
-      props['padding-right'] = paddingRight;
     }
 
     if (this.tagName === 'document') {
