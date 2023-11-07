@@ -9,6 +9,15 @@ Shadow is a new novel web engine made (almost) entirely in JS from scratch.
 - [Introducing Shadow](https://goose.icu/introducing-shadow/)
 - [Shadow Devlog #1](https://goose.icu/shadow-devlog-1/)
 
+## Contributing
+To run the repo, just serve the root directory using a local HTTP server like [sirv-cli](https://github.com/lukeed/sirv):
+
+```sh
+npx sirv-cli .
+
+# Now navigate to: http://localhost:8080/index.html
+```
+
 <!--
 ### next up
 
