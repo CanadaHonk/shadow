@@ -29,7 +29,7 @@ window.onpopstate = ({ state }) => {
     else welcome();
 };
 
-window.reload = () => load(...lastLoad);
+window.reload = () => load(lastLoad[0], lastLoad[1], false);
 
 window.profile = {};
 window.profileSubsteps = {};
