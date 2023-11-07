@@ -81,7 +81,19 @@ export class LayoutNode extends Node {
 
       this[k] = function() {
         if (this.cache[k]) return this.cache[k];
-        return this.cache[k] = f.apply(this, arguments);
+
+        this.cache[k] = f.apply(this, arguments);
+        if (Number.isNaN(this.cache[k])) {
+          console.warn('NaN', k, this.tagName);
+
+          // hack: set to 0 instead of NaN
+          this.cache[k] = 0;
+
+          // throw new Error(`NaN ${k} (${this.tagName})`);
+          // debugger;
+        }
+
+        return this.cache[k];
       }.bind(this);
     };
 
