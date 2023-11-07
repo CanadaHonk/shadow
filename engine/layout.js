@@ -535,7 +535,7 @@ export class LayoutNode extends Node {
         }
 
         // (val / 100) * parent property value
-        return parent[propToFunc(prop)] * (val / 100);
+        return parent[propToFunc(prop)]() * (val / 100);
 
       case 'em':
         if (property === 'font-size') {
