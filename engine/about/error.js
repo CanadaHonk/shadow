@@ -15,7 +15,7 @@ ${title ? `<h2>${title}</h2>` : ''}
 
 <pre>${error.replaceAll('\n', '<br>')}</pre>
 
-<a target="_parent" href="https://github.com/CanadaHonk/shadow/issues/new?title=${encodeURIComponent(`Crash report: ${erroringURL}`)}&body=${encodeURIComponent(error)}">Report on GitHub Issues</a>
+<a target="_parent" href="https://github.com/CanadaHonk/shadow/issues/new?title=${encodeURIComponent(`Crash: ${erroringURL}`)}&body=${encodeURIComponent(error)}">Report on GitHub Issues</a>
 
 <style>
 body {
