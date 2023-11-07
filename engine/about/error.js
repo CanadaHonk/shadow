@@ -1,7 +1,7 @@
 export default ({ url }) => {
-  const error = atob(url.split('?')[1]);
+  const { error, url: erroringURL } = JSON.parse(atob(url.split('?')[1]));
 
-  let title = 'Fatal error';
+  let title = '';
   if (error.includes('HTMLParser')) title = 'HTML parser error';
   if (error.includes('CSSParser')) title = 'CSS parser error';
   if (error.includes('Render')) title = 'Render error';
@@ -10,9 +10,12 @@ export default ({ url }) => {
   return `<title>Shadow error</title>
 <meta name="color-scheme" content="dark light">
 <body>
-<h1>${title}</h1>
+<h1>Page crashed</h1>
+${title ? `<h2>${title}</h2>` : ''}
 
 <pre>${error.replaceAll('\n', '<br>')}</pre>
+
+<a target="_parent" href="https://github.com/CanadaHonk/shadow/issues/new?title=${encodeURIComponent(`Crash report: ${erroringURL}`)}&body=${encodeURIComponent(error)}">Report on GitHub Issues</a>
 
 <style>
 body {

@@ -18,7 +18,8 @@ window.version = `2023.11.06`;
 const welcome = () => load('about:welcome');
 window.welcome = welcome;
 
-const error = e => console.error(e) || load(`about:error?${btoa(e.stack ?? e)}`);
+const error = e => console.error(e) || load(`about:error?${btoa(JSON.stringify({ error: e.stack ?? e, url: window._location.url }))}`);
+// const error = e => { throw e; };
 window.error = error;
 
 window.onpopstate = ({ state }) => {
