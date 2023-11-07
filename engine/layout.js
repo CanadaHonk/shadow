@@ -546,6 +546,8 @@ export class LayoutNode extends Node {
         // val * node font size
         return this.fontSize() * val;
     }
+
+    return 0;
   }
 
   horizontalSpace(margin = false) {
