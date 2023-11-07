@@ -486,7 +486,7 @@ export class LayoutNode extends Node {
     // if we have block children with width: auto, become block
     if (this.children.some(x => x.isBlock() && x.css().width === 'auto')) return true;
 
-    return this.display() === 'block' || this.display() === 'list-item';
+    return this.display() === 'block' || this.display() === 'list-item' || this.display() === 'flex';
   }
   isInline() {
     return !this.isBlock();
