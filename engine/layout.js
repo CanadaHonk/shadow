@@ -541,6 +541,7 @@ export class LayoutNode extends Node {
     }
 
     val = parseFloat(val);
+    if (Number.isNaN(val)) val = 0;
 
     switch (unit) {
       case 'px': return val;
