@@ -64,6 +64,10 @@ const defaultFontSize = {
   monospace: 13
 }; // px
 
+// yes.
+const CM = 37.8; // px
+const IN = 96; // px
+
 const byPtr = {};
 export class LayoutNode extends Node {
   renderer = null;
@@ -533,6 +537,13 @@ export class LayoutNode extends Node {
 
     switch (unit) {
       case 'px': return val;
+
+      case 'cm': return val * CM;
+      case 'mm': return val * (CM / 10);
+      case 'Q': return val * (CM / 40);
+      case 'in': return val * IN;
+      case 'pc': return val * (IN / 6);
+      case 'pt': return val * (IN / 72);
 
       case '%':
         let prop = property;
