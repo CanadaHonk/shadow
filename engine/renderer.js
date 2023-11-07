@@ -278,8 +278,10 @@ export class Renderer {
 
       const target = deltaTime + frameTime;
 
+      const scale = 8;
+
       this.ctx.fillStyle = `rgba(20, 250, 20, 0.1)`;
-      this.ctx.fillRect(graphX, graphY + target * 8, 300, 160 - target * 8);
+      this.ctx.fillRect(graphX, graphY + target * scale, 300, 160 - target * scale);
 
       this.ctx.font = '14px monospace';
       this.ctx.textBaseline = 'top';
@@ -288,7 +290,7 @@ export class Renderer {
 
       const ftAvg = ftData.reduce((acc, x) => acc + x, 0) / ftData.length;
 
-      const ftStartY = graphY + (160 - /* (ftData[0] + ftData[1] + ftData[2] + ftData[3] + ftData[4]) / 5 */ ftAvg * 8);
+      const ftStartY = graphY + (160 - /* (ftData[0] + ftData[1] + ftData[2] + ftData[3] + ftData[4]) / 5 */ ftAvg * scale);
 
       this.ctx.fillText('t', graphX + 4, ftStartY - 18);
       this.ctx.fillText('ᶠ', graphX + 4 + 7, ftStartY - 11);
@@ -303,13 +305,13 @@ export class Renderer {
       this.ctx.moveTo(graphX, ftStartY);
       for (let i = 0; i < ftData.length; i++) {
         // ctx.fillStyle = `rgba(0, 0, 0, 1)`;
-        this.ctx.lineTo(graphX + i, graphY + (160 - Math.min(160, ftData[i] * 8)));
+        this.ctx.lineTo(graphX + i, graphY + (160 - Math.min(160, ftData[i] * scale)));
       }
 
       this.ctx.stroke();
 
       const dtAvg = dtData.reduce((acc, x) => acc + x, 0) / dtData.length;
-      const dtStartY = graphY + (160 - /* (dtData[0] + dtData[1] + dtData[2] + dtData[3] + dtData[4]) / 5 */ dtAvg * 8);
+      const dtStartY = graphY + (160 - /* (dtData[0] + dtData[1] + dtData[2] + dtData[3] + dtData[4]) / 5 */ dtAvg * scale);
 
       this.ctx.font = '14px monospace';
       this.ctx.fillText('Δt', graphX + 4, dtStartY - 18);
@@ -323,7 +325,7 @@ export class Renderer {
       this.ctx.moveTo(graphX, dtStartY);
       for (let i = 0; i < dtData.length; i++) {
         // ctx.fillStyle = `rgba(0, 0, 0, 1)`;
-        this.ctx.lineTo(graphX + i, graphY + (160 - Math.min(160, dtData[i] * 8)));
+        this.ctx.lineTo(graphX + i, graphY + (160 - Math.min(160, dtData[i] * scale)));
       }
 
       this.ctx.stroke();
