@@ -13,7 +13,7 @@ if (window.crossOriginIsolated === false) {
   // if (worker.active.state === 'activated') location.reload();
 }
 
-window.version = `2023.11.06`;
+window.version = `2023.11.07`;
 
 const welcome = () => load('about:welcome');
 window.welcome = welcome;
