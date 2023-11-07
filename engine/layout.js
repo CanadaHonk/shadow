@@ -359,11 +359,15 @@ export class LayoutNode extends Node {
   }
 
   // run functions, etc (probably a better name?)
-  resolveValue(x) {
+  resolveValue(x, property, parent = this.parent) {
     if (!x) return x;
 
+    if (x === 'inherit') {
+      return parent[propToFunc(property)]();
+    }
+
     return x.replace(/([a-z-]+)\((.*)\)/ig, (_, func, rawArgs) => {
-      const args = this.resolveValue(rawArgs).split(',').map(x => x.trim());
+      const args = this.resolveValue(rawArgs, property, parent).split(',').map(x => x.trim());
 
       switch (func) {
         case 'var': {
@@ -372,7 +376,7 @@ export class LayoutNode extends Node {
           let parent = this;
           while (parent) {
             let value = parent.css()[name];
-            if (value) return this.resolveValue(value);
+            if (value) return this.resolveValue(value, property, parent);
 
             parent = parent.parent;
           }
@@ -495,7 +499,7 @@ export class LayoutNode extends Node {
 
   // technically <length-percentage> but uhm yeah
   lengthAbs(i, property, parent = this.parent) {
-    const x = this.resolveValue(i);
+    const x = this.resolveValue(i, property, parent);
 
     if (property === 'font-size') {
       // :/
@@ -1054,8 +1058,8 @@ export class LayoutNode extends Node {
     return pagePrefers;
   }
 
-  colorAbs(i) {
-    const x = this.resolveValue(i);
+  colorAbs(i, property, parent = this.parent) {
+    const x = this.resolveValue(i, property, parent);
     const colorScheme = this.colorScheme();
 
     switch (x) {
@@ -1070,7 +1074,7 @@ export class LayoutNode extends Node {
   }
 
   color() {
-    return this.colorAbs(this.css().color);
+    return this.colorAbs(this.css().color, 'color');
   }
 
   backgroundColor() {
@@ -1081,7 +1085,7 @@ export class LayoutNode extends Node {
       if (bodyVal) val = bodyVal;
     }
 
-    return this.colorAbs(val);
+    return this.colorAbs(val, 'background-color');
   }
 
   _image;
