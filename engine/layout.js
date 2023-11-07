@@ -499,7 +499,8 @@ export class LayoutNode extends Node {
 
   // technically <length-percentage> but uhm yeah
   lengthAbs(i, property, parent = this.parent) {
-    const x = this.resolveValue(i, property, parent);
+    const x = this.resolveValue(i ?? '', property, parent);
+    if (typeof x === 'number') return x;
 
     if (property === 'font-size') {
       // :/
