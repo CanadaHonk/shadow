@@ -997,11 +997,14 @@ export class LayoutNode extends Node {
     if (this.isInline() && this.css()['text-align'] !== 'left') {
       // hack: align next time as we cannot compute our own width here
       if (!this.cache._alignWidth) {
-        setTimeout(() => {
-          this.cache._alignWidth = this.totalWidth();
-          this.cache._alignWidthParent = this.parent.contentWidth();
-          this.invalidateCaches(false, ['_alignWidth', '_alignWidthParent']);
-        }, 0);
+        if (this.cache._alignWidth === undefined) {
+          this.cache._alignWidth = null;
+          setTimeout(() => {
+            this.cache._alignWidth = this.totalWidth();
+            this.cache._alignWidthParent = this.parent.contentWidth();
+            this.invalidateCaches(false, ['_alignWidth', '_alignWidthParent']);
+          }, 0);
+        }
 
         return this._alignTmp ?? -9999;
       }
