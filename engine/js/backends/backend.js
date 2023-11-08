@@ -3,7 +3,7 @@ const decoder = new TextDecoder('utf8');
 const SERIAL_RES_SIZE = 1024 * 1024 * 10;
 const decodeBuffer = new Uint8Array(SERIAL_RES_SIZE);
 
-let lengthBuffer, lengthTyped, valueBuffer, valueTyped;
+let lengthBuffer, lengthTyped, valueBuffer, valueTyped, js;
 self.addEventListener('message', e => {
   // console.log('special worker onmessage', e.data);
   if (!lengthBuffer && e.data.lengthBuffer) {
@@ -12,6 +12,8 @@ self.addEventListener('message', e => {
 
     valueBuffer = e.data.valueBuffer;
     valueTyped = new Uint8Array(valueBuffer);
+
+    js = e.data.js;
   }
 });
 
@@ -32,8 +34,10 @@ const loadWasm = async url => {
 };
 
 export default async (url, args) => {
-  const js = await (await fetch('/engine/js/ipc/inside.js')).text();
   const wasmModule = await loadWasm(url);
+
+  // hack: kiesel does not have await yet and isn't even called so just remove it
+  if (args[0] === 'kiesel') js = js.replace('await ', '');
 
   const wasmFs = new WasmFs();
 
