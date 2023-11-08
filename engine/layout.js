@@ -615,8 +615,27 @@ export class LayoutNode extends Node {
     return (this._image?.width || 1) / (this._image?.height || 1);
   }
 
+  cssWidth() {
+    if (this.isInline()) return null;
+
+    let val = this.css().width;
+    if (val === 'auto') return null;
+
+    return this.lengthAbs(val, 'width');
+  }
+
+  cssHeight() {
+    if (this.isInline()) return null;
+
+    let val = this.css().height;
+    if (val === 'auto') return null;
+
+    return this.lengthAbs(val, 'height');
+  }
+
   imageWidth() {
-    if (this.css().width !== 'auto') return this.lengthAbs(this.css().width, 'width');
+    let cssWidth;
+    if (cssWidth = this.cssWidth()) return cssWidth;
 
     if (this.attrs.width) return this.lengthAbs(this.attrs.width, 'width-attr');
     if (this.attrs.height || this.css().height !== 'auto') return this.imageHeight() * this.imageRatio();
@@ -625,7 +644,8 @@ export class LayoutNode extends Node {
   }
 
   imageHeight() {
-    if (this.css().height !== 'auto') return this.lengthAbs(this.css().height, 'height');
+    let cssHeight;
+    if (cssHeight = this.cssHeight()) return cssHeight;
 
     if (this.attrs.height) return this.lengthAbs(this.attrs.height, 'height-attr');
     if (this.attrs.width || this.css().width !== 'auto') return this.imageWidth() / this.imageRatio();
@@ -765,9 +785,8 @@ export class LayoutNode extends Node {
     if (this.isImage()) return this.imageWidth();
 
     // manually set width
-    if (this.css().width !== 'auto') {
-      return this.lengthAbs(this.css().width, 'width');
-    }
+    let cssWidth;
+    if (cssWidth = this.cssWidth()) return cssWidth;
 
     if (this.isBlock()) {
       let space = this.horizontalSpace();
@@ -788,9 +807,9 @@ export class LayoutNode extends Node {
   contentHeight() {
     if (this.isImage()) return this.imageHeight();
 
-    if (this.css().height !== 'auto') {
-      return this.lengthAbs(this.css().height, 'height');
-    }
+    // manually set height
+    let cssHeight;
+    if (cssHeight = this.cssHeight()) return cssHeight;
 
     if (true) {
       let maxY = 0;
