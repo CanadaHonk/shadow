@@ -38,9 +38,7 @@ export const CombinatorType = {
 const isspace = c => c === ' ' || c === '\n';
 
 export class CSSRule {
-  static {
-    this.prototype.type = RuleType.None;
-  }
+  type = RuleType.None;
   selectors = [];
   properties = {};
 
@@ -121,11 +119,9 @@ export class CSSRule {
 }
 
 class CSSRegularAtRule {
-  static {
-    this.prototype.type = RuleType.RegularAt;
-    this.prototype.atName = '';
-    this.prototype.atCond = '';
-  }
+  type = RuleType.NestedAt;
+  atName = '';
+  atCond = '';
 
   constructor(name, cond) {
     this.atName = name;
@@ -134,11 +130,9 @@ class CSSRegularAtRule {
 }
 
 class CSSNestedAtRule {
-  static {
-    this.prototype.type = RuleType.NestedAt;
-    this.prototype.atName = '';
-    this.prototype.atCond = '';
-  }
+  type = RuleType.NestedAt;
+  atName = '';
+  atCond = '';
   rules = [];
 
   constructor(name, cond) {
@@ -148,25 +142,22 @@ class CSSNestedAtRule {
 }
 
 export class CSSParser {
-  static {
-    this.prototype.mainState = MainState.None;
-    this.prototype.stringState = StringState.None;
-    this.prototype.atState = AtState.None;
-    this.prototype.escaping = false;
-  
-    this.prototype.currentSelector = '';
+  mainState = MainState.None;
+  stringState = StringState.None;
+  atState = AtState.None;
+  escaping = false;
 
-    this.prototype.currentRule = null;
-    this.prototype.parentRule = null;
-  
-    this.prototype.currentProp = '';
-    this.prototype.currentValue = '';
-  
-    this.prototype.currentAtName = '';
-    this.prototype.currentAtCond = '';
-  }
+  currentSelector = '';
 
   rules = [];
+  currentRule = null;
+  parentRule = null;
+
+  currentProp = '';
+  currentValue = '';
+
+  currentAtName = '';
+  currentAtCond = '';
 
   constructor(bailing = true) {
     if (bailing) {

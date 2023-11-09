@@ -14,10 +14,7 @@ let cWidth = window.innerWidth;
 let cHeight = window.innerHeight;
 
 export class Renderer {
-  static {
-    this.prototype.layout = null;
-    this.prototype.lastRootPtr = 0;
-  }
+  layout = null;
 
   constructor() {
     this.canvas = document.createElement('canvas');
@@ -90,6 +87,7 @@ export class Renderer {
     };
   }
 
+  lastRootPtr = 0;
   update() {
     if (!this.layout) {
       requestAnimationFrame(this.update);

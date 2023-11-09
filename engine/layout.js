@@ -70,9 +70,7 @@ const IN = 96; // px
 
 const byPtr = {};
 export class LayoutNode extends Node {
-  static {
-    this.prototype.renderer = null;
-  }
+  renderer = null;
 
   cache = {};
   constructor(node, renderer) {

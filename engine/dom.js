@@ -1,14 +1,11 @@
 export class Node {
-  static {
-    this.prototype.tagName = '';
-    this.prototype.parent = null;
-    this.prototype.document = null;
-    this.prototype.content = '';
-    this.prototype._classesCache = null;
-  }
-
+  tagName = '';
+  parent = null;
+  document = null;
   children = [];
   attrs = {};
+
+  content = '';
 
   constructor(tagName = '', document = null) {
     Object.assign(this, { tagName, document });
