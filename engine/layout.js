@@ -565,6 +565,26 @@ export class LayoutNode extends Node {
           return window.innerWidth * (val / 100);
         }
 
+        if (prop === 'height') {
+          // hack: uh oh! this is hard to summarize
+          // say we have a block height % inside another block (height: auto)
+          // we want to get the height of the usable parent, eg has a specified height
+          // honestly idk how to do this legitTM (easily)
+
+          let usableParent = parent;
+          while (usableParent && !usableParent.cssHeight()) {
+            usableParent = usableParent.parent;
+          }
+
+          let height;
+
+          // ultrahack: no usable parent, use renderer height
+          if (!usableParent) height = this.renderer.canvas.height;
+            else height = usableParent.height();
+
+          return height * (val / 100);
+        }
+
         // (val / 100) * parent property value
         return parent[propToFunc(prop)]() * (val / 100);
 
