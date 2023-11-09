@@ -38,20 +38,22 @@ const SELF_CLOSING_RULES = {
 };
 
 export class HTMLParser {
-  attrState = AttrState.None;
-  tagState = TagState.None;
-  stringState = StringState.None;
-  escaping = false;
-
-  currentAttrName = '';
-  currentAttrValue = '';
-
-  currentName = '';
+  static {
+    this.prototype.attrState = AttrState.None;
+    this.prototype.tagState = TagState.None;
+    this.prototype.stringState = StringState.None;
+    this.prototype.escaping = false;
+  
+    this.prototype.currentAttrName = '';
+    this.prototype.currentAttrValue = '';
+  
+    this.prototype.currentName = '';
+    this.prototype.currentNode = null;
+    this.prototype.textNode = null;
+  }
 
   document = new Document();
   parent = this.document;
-  currentNode = null;
-  textNode = null;
 
   constructor() {}
 
