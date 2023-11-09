@@ -122,9 +122,7 @@ export class CSSRule {
 
 class CSSRegularAtRule {
   static {
-    // For review: I've copied what was originally here, but should this rather
-    // be RuleType.RegularAt?
-    this.prototype.type = RuleType.NestedAt;
+    this.prototype.type = RuleType.RegularAt;
     this.prototype.atName = '';
     this.prototype.atCond = '';
   }
