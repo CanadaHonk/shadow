@@ -1275,10 +1275,6 @@ export class LayoutNode extends Node {
       return str;
     };
 
-    // https://html.spec.whatwg.org/#serialising-html-fragments
-    // 1. If the node serializes as void, then return the empty string.
-    if (this.voidElement) return '';
-
     // 2. Let s be a string, and initialize it to the empty string.
     let s = '';
 
