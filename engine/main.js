@@ -1,9 +1,13 @@
 import { Page } from './network.js';
 import { HTMLParser } from './htmlparser.js';
-import { LayoutNode, constructLayout } from './layout.js';
+import { constructLayout } from './layout.js';
 import { Renderer } from './renderer.js';
 import * as JS from './js/index.js';
 import * as AboutPages from './about/index.js';
+
+// we do not use any of these in main world yet so do not import
+// import './polys.js';
+
 
 window._js = JS;
 
