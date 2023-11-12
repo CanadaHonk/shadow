@@ -312,6 +312,15 @@ export class LayoutNode extends Node {
               break;
             }
 
+            case 'margin-inline':
+            case 'margin-block': {
+              const [ start, end ] = this.parse2Shorthand(v);
+
+              props[x + '-start'] = start;
+              props[x + '-end'] = end;
+              break;
+            }
+
             case 'background': {
               // just alias for background-color for now
               props['background-color'] = v;
