@@ -300,6 +300,7 @@ export class LayoutNode extends Node {
         for (const x in rule.properties) {
           const v = rule.properties[x];
 
+          // todo: cssparser should have to care about parsing longhands, not layout
           switch (x) {
             case 'margin':
             case 'padding': {
