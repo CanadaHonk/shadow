@@ -111,7 +111,7 @@ export class Renderer {
     const inspects = [];
 
     this.ctx.textBaseline = 'bottom';
-    const draw = (_, depth = 0) => {
+    const draw = _ => {
       if (_.display() === 'none') return;
 
       let x = _.x(), y = _.y(), width = _.width(), height = _.height();
@@ -119,16 +119,10 @@ export class Renderer {
       // only care about y (for now)
       const isOffscreen = y > (scrollY + cHeight) || (y + height) < scrollY;
 
-      // if (_.tagName === 'h1') console.log({ x, y, width, height });
-
       if (!isOffscreen && debug === 1 && _.tagName !== 'document') {
-        // this.ctx.fillStyle = `rgba(0, 100, 0, ${(depth + 1) * 0.1})`;
-        // this.ctx.fillRect(x, y, width, height);
         if (lastMousePos[0] >= x && lastMousePos[0] <= (x + width) && (lastMousePos[1] + scrollY) >= y && (lastMousePos[1] + scrollY) <= (y + height)) {
           if (_.tagName !== '#text') {
             inspects.push(() => {
-              // this.ctx.fillStyle = `rgba(0, ${_.tagName !== '#text' ? 200 : 0}, ${_.tagName === '#text' ? 200 : 0}, 0.2)`;
-
               this.ctx.fillStyle = `rgba(249, 204, 157, 0.5)`;
 
               this.ctx.fillRect(x - _.marginLeft(), y - _.marginTop(), width + _.marginLeft() + _.marginRight(), _.marginTop()); // top margin
@@ -155,13 +149,6 @@ export class Renderer {
 
               this.infoBox(`${_.tagName} (x=${x},y=${y},w=${width},h=${height},tw=${_.totalWidth()},th=${_.totalHeight()})`, x - _.marginLeft(), infoY, infoAlignBottom);
             });
-
-            if (_.isBlock()) {
-              hoverEl = _;
-
-              const newCursor = _.parent.css().cursor;
-              if (newCursor !== 'auto') cursor = newCursor;
-            }
           }
         }
       }
@@ -232,9 +219,9 @@ export class Renderer {
         // this.ctx.fillRect(x, y, width, height);
       }
 
-      if (_.tagName === 'iframe') draw(_.contentDocument, depth + 1);
+      if (_.tagName === 'iframe') draw(_.contentDocument);
 
-      for (const z of _.children) draw(z, depth + 1);
+      for (const z of _.children) draw(z);
     };
     draw(this.layout);
 
@@ -304,7 +291,7 @@ export class Renderer {
 
       this.ctx.lineWidth = 1;
       this.ctx.strokeStyle = 'rgba(0, 0, 250, 0.8)';
-      this.ctx.moveTo(graphX, ftStartY);
+      this.ctx.moveTo(graphX, 160 - Math.min(160, ftData[0] * scale));
       for (let i = 0; i < ftData.length; i++) {
         // ctx.fillStyle = `rgba(0, 0, 0, 1)`;
         this.ctx.lineTo(graphX + i, graphY + (160 - Math.min(160, ftData[i] * scale)));
@@ -324,7 +311,7 @@ export class Renderer {
       this.ctx.beginPath();
       this.ctx.lineWidth = 1;
       this.ctx.strokeStyle = 'rgba(250, 0, 0, 0.8)';
-      this.ctx.moveTo(graphX, dtStartY);
+      this.ctx.moveTo(graphX, 160 - Math.min(160, dtData[0] * scale));
       for (let i = 0; i < dtData.length; i++) {
         // ctx.fillStyle = `rgba(0, 0, 0, 1)`;
         this.ctx.lineTo(graphX + i, graphY + (160 - Math.min(160, dtData[i] * scale)));
