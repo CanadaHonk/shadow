@@ -192,11 +192,3 @@ window.omniload = omniload;
 
 if (location.search) load(decodeURIComponent(location.search.slice(1)));
   else welcome();
-
-// load('https://serenityos.org');
-// load('https://info.cern.ch/hypertext/WWW/TheProject.html');
-// load('https://whatwg.org');
-
-// load('http://localhost:1337/test.html');
-
-// tie it all together!
