@@ -159,6 +159,21 @@ export class Renderer {
         this.ctx.fillRect(x, y, width, height);
       }
 
+      // this is not spec compliant lol
+      if (!isOffscreen && _.display() === 'list-item') {
+        const type = _.css()['list-style-type'];
+
+        let marker;
+        if (type === 'disc') marker = '• ';
+        if (type === 'numeric') marker = `${_.parent.children.indexOf(_) + 1}. `;
+
+        this.ctx.fillStyle = _.color();
+        this.ctx.font = _.font();
+        const measure = this.ctx.measureText(marker + '  ');
+
+        this.ctx.fillText(marker, x - measure.width, y + (measure.height ?? (Math.abs(measure.fontBoundingBoxAscent) + Math.abs(measure.fontBoundingBoxDescent))));
+      }
+
       if (!isOffscreen && _.tagName === '#text') {
         this.ctx.fillStyle = _.color();
 
