@@ -569,7 +569,7 @@ document.onwheel = e => {
   if (scrollY < 0) scrollY = 0;
   scrollY = Math.min(scrollY, Math.max(0, (window._renderer.layout?.totalHeight?.() || 0) - cHeight));
 
-  window._renderer.ctx.setTransform(renderScale, 0, 0, renderScale, 0, -scrollY);
+  window._renderer.ctx.setTransform(renderScale, 0, 0, renderScale, 0, -scrollY * renderScale);
 };
 
 window.onresize = x => {
@@ -581,7 +581,7 @@ window.onresize = x => {
   window._renderer.canvas.width = cWidth * renderScale;
   window._renderer.canvas.height = cHeight * renderScale;
 
-  window._renderer.ctx.setTransform(renderScale, 0, 0, renderScale, 0, -scrollY);
+  window._renderer.ctx.setTransform(renderScale, 0, 0, renderScale, 0, -scrollY * renderScale);
 
   if (x !== 'ignore_last') window._renderer.layout?.invalidateCaches?.();
 };
