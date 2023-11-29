@@ -526,6 +526,8 @@ export class LayoutNode extends Node {
     if (typeof x === 'number') return x;
 
     if (property === 'font-size') {
+      if (this.tagName === 'document') return this.defaultFontSize();
+
       // :/
       switch (x) {
         case 'xx-small': return this.defaultFontSize() * (3/5);
