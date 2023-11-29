@@ -701,7 +701,7 @@ export class LayoutNode extends Node {
   lineHeight() {
     let val = this.css()['line-height'];
     if (val === 'normal') {
-      // get default line-height based on font properties (lol)
+      // get default line-height based on font "properties" (lol)
       // return this.renderer.measureText('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', this.font()).height;
       return Math.ceil(this.renderer.measureText('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', this.font()).height) + 1;
     }
@@ -711,7 +711,7 @@ export class LayoutNode extends Node {
 
   maxWidth() {
     const val = this.css()['max-width'];
-    if (val === 'none') return undefined;
+    if (val === 'none') return null;
 
     return this.lengthAbs(val, 'max-width');
   }
@@ -720,7 +720,7 @@ export class LayoutNode extends Node {
     // get nearest block/non auto inline parent
     let parent = this.parent;
     while (true) {
-      if (parent.isBlock() || parent.css().width !== 'auto' || parent.maxWidth() !== undefined) break;
+      if (parent.isBlock() || parent.cssWidth() !== null || parent.maxWidth() !== null) break;
       parent = parent.parent;
     }
 
