@@ -1,6 +1,3 @@
-const days = new Date(new Date() - new Date('2023-10-23')).getDate();
-const weeks = Math.floor(days / 7);
-
 const demos = [
   [ 'https://serenityos.org', 'basic - looks good' ],
   [ 'https://serenityos.org/happy/1st/', 'a lot of text and images - looks good' ],
@@ -45,7 +42,7 @@ export default () => `<title>Shadow</title>
 <meta name="color-scheme" content="dark light">
 <body>
 <h1>welcome to Shadow <small>v${version}</small></h1>
-<p>Shadow is a ${weeks} week old novel browser engine made (almost) entirely in JS from scratch,<br>only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>
+<p>Shadow is a novel browser engine made (almost) entirely in JS from scratch,<br>only using the parent browser for networking (<code>fetch</code>) and the rendering backend (<code>&lt;canvas&gt;</code>)</p>
 <p>here's a twist: <u>you're using it right now</u>!</p>
 <p>here are some debug keybinds for you:</p>
 <ul>
