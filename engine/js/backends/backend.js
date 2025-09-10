@@ -21,6 +21,14 @@ let wasmModule, WasmFs, WASI, browserBindings;
 const loadWasm = async url => {
   if (wasmModule) return wasmModule;
 
+  // fix esm.sh node compat bug (?)
+  const { Buffer } = await import ('https://esm.sh/node/buffer.mjs');
+  const original = Buffer.prototype.copy;
+  Buffer.prototype.copy = function () {
+    if (arguments[0] instanceof Uint8Array) arguments[0] = Buffer.from(arguments[0]);
+    return original.apply(this, arguments);
+  };;
+
   // todo: use 1.x versions (breaking)
   0, { WASI } = await import('https://esm.sh/@wasmer/wasi@0.12.0');
   0, browserBindings = (await import('https://esm.sh/@wasmer/wasi@0.12.0/lib/bindings/browser')).default;

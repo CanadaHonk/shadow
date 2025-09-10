@@ -8,6 +8,10 @@ if (typeof ipc === 'undefined') {
       return ipc.recv(ignoreEval ?? true);
     },
 
+    sendAsync: async (msg, ignoreEval) => {
+      return globalThis.ipc.send(msg, ignoreEval);
+    },
+
     recv: (ignoreEval) => {
       while (true) {
         const read = readline();
