@@ -10,6 +10,7 @@ export class Page {
 
   async fetch(input = '', corsProxy = !input.startsWith('data:') && !input.includes('://localhost')) {
     let url = this.resolve(input);
-    return await fetch((corsProxy ? 'https://cors-anywhere.com/' : '') + url);
+    return await fetch(url);
+    // return await fetch((corsProxy ? 'https://cors-anywhere.com/' : '') + url);
   }
 }
